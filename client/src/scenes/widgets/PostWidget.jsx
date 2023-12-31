@@ -70,7 +70,7 @@ import {
         <FlexBetween mt="0.25rem">
           <FlexBetween gap="1rem">
             <FlexBetween gap="0.3rem">
-              <IconButton onClick={patchLike}>
+              <IconButton onClick={patchLike} onTouchEnd={patchLike}>
                 {isLiked ? (
                   <FavoriteOutlined sx={{ color: primary }} />
                 ) : (
