@@ -22,12 +22,12 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const medium = palette.neutral.medium;
 
   const isFriend = friends.find((friend) => friend._id === friendId);
-  // console.log(isFriend);
 
 
   const patchFriend = async () => {
+    const URL = import.meta.env.VITE_URL;
     const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
+      `${URL}/users/${_id}/${friendId}`,
       {
         method: "PATCH",
         headers: {
@@ -37,6 +37,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
       }
     );
     const data = await response.json();
+    console.log(data);
     dispatch(setFriends({ friends: data }));
   };
 

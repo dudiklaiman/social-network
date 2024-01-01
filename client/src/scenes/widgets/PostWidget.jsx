@@ -36,7 +36,8 @@ import { apiPatchWithToken } from "src/utils/apiRequests";
     const primary = palette.primary.main;
   
     const patchLike = async () => {
-      const response = await fetch(`https://social-network-backend-zgwx.onrender.com/posts/${postId}/like`, {
+      const baseUrl = import.meta.env.VITE_URL;
+      const response = await fetch(`${baseUrl}/posts/${postId}/like`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
