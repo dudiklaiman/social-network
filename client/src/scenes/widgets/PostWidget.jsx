@@ -71,7 +71,7 @@ import {
         <FlexBetween mt="0.25rem">
           <FlexBetween gap="1rem">
             <FlexBetween gap="0.3rem">
-              <IconButton onClick={patchLike} onTouchEnd={patchLike}>
+              <IconButton onClick={() => alert("button is pressed!")} >
                 {isLiked ? (
                   <FavoriteOutlined sx={{ color: primary }} />
                 ) : (
