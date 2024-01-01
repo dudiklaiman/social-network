@@ -35,6 +35,7 @@ import {
     const primary = palette.primary.main;
   
     const patchLike = async () => {
+      alert("like button is pressed");
       const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
         method: "PATCH",
         headers: {
@@ -45,7 +46,6 @@ import {
       });
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
-      alert("like button is pressed");
     };
   
     return (
@@ -71,7 +71,7 @@ import {
         <FlexBetween mt="0.25rem">
           <FlexBetween gap="1rem">
             <FlexBetween gap="0.3rem">
-              <IconButton onClick={() => alert("button is pressed!")} >
+              <IconButton onClick={patchLike} >
                 {isLiked ? (
                   <FavoriteOutlined sx={{ color: primary }} />
                 ) : (
