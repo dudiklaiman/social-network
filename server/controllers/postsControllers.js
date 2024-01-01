@@ -98,12 +98,11 @@ export const likePost = async (req, res) => {
             post.likes.set(userId, true);
         }
 
+        post.markModified('likes');
+        await post.save();
+        
         const updatedPost = await PostModel
-        .findByIdAndUpdate(
-            id,
-            { likes: post.likes },
-            { new: true }
-        )
+        .findById(id)
         .populate({
             path: 'user',
             model: UserModel,

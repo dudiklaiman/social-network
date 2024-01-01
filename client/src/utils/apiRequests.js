@@ -31,7 +31,7 @@ export const apiPost = async (endpoint, body, customHeaders = {}) => {
 
 export const apiPatchWithToken = async (endpoint, token, customHeaders = {}) => {
     const URL = import.meta.env.VITE_URL;
-    const defaultHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+    const defaultHeaders = { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', Authorization: `Bearer ${token}` };
     const headers = { ...defaultHeaders, ...customHeaders };
     
     const { data } = await axios.patch(`${URL}/${endpoint}`, null, { headers });

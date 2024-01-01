@@ -11,6 +11,7 @@ import {
   import { useState } from "react";
   import { useDispatch, useSelector } from "react-redux";
   import { setPost } from "src/state/index";
+import { apiPatchWithToken } from "src/utils/apiRequests";
   
   const PostWidget = ({
     postId,
@@ -35,18 +36,17 @@ import {
     const primary = palette.primary.main;
   
     const patchLike = async () => {
-      alert("like button is pressed");
-      const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+      const response = await fetch(`https://social-network-backend-zgwx.onrender.com/posts/${postId}/like`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: loggedInUserId }),
       });
       const updatedPost = await response.json();
+      // const data = await apiPatchWithToken(`posts/${postId}/like`, token);
+      // console.log(updatedPost);
       dispatch(setPost({ post: updatedPost }));
-      alert("like button is pressed2");
     };
   
     return (
