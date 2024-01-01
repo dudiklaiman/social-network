@@ -45,6 +45,7 @@ import {
       });
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
+      alert("like button is pressed");
     };
   
     return (
