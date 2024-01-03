@@ -54,7 +54,7 @@ const NewComment = ({ postId }) => {
     };
 
     return (
-        <WidgetWrapper padding="1.5rem 0rem 0.75rem 0.5rem">
+        <WidgetWrapper padding="1rem 0rem 1rem 0.5rem">
             <FlexBetween gap="1.5rem">
                 <UserImage image={user.picturePath} size="40px" />
                 <InputBase

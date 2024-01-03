@@ -1,3 +1,4 @@
+import CommentModel from '../models/commentModel.js';
 import PostModel from '../models/postModel.js'
 import UserModel from '../models/userModel.js';
 import { validateCreatePost } from '../services/postValidation.js'
@@ -9,6 +10,23 @@ cloudinary.config({
     api_key: '911992345193834',
     api_secret: 'ASs6JLTa5TKtfVTroWDw-ubmogs'
 });
+
+const configPopulate = [
+    {
+        path: 'user',
+        model: UserModel,
+        select: '-password'
+    },
+    {
+        path: 'comments',
+        model: CommentModel,
+        populate: {
+            path: 'user',
+            model: UserModel,
+            select: '-password'
+        }
+    },
+];
 
 
 export const createPost = async (req, res) => {
@@ -29,21 +47,10 @@ export const createPost = async (req, res) => {
         await post.save();
 
         const allPosts = await PostModel
-        .find()
-        .sort({ createdAt: -1 })
-        .populate([
-            {
-                path: 'user',
-                model: UserModel,
-                select: '-password'
-            },
-            {
-                path: 'comments.user',
-                model: UserModel,
-                select: '-password'
-            }
-        ]);
-        
+            .find()
+            .sort({ createdAt: -1 })
+            .populate(configPopulate);
+
         res.status(201).json(allPosts);
     }
     catch (err) {
@@ -55,20 +62,9 @@ export const createPost = async (req, res) => {
 export const getPostsFeed = async (req, res) => {
     try {
         const allPosts = await PostModel
-        .find()
-        .sort({ createdAt: -1 })
-        .populate([
-            {
-                path: 'user',
-                model: UserModel,
-                select: '-password'
-            },
-            {
-                path: 'comments.user',
-                model: UserModel,
-                select: '-password'
-            }
-        ]);
+            .find()
+            .sort({ createdAt: -1 })
+            .populate(configPopulate);
 
         res.status(200).json(allPosts);
     }
@@ -82,22 +78,10 @@ export const getUserPosts = async (req, res) => {
     try {
         const { userId } = req.params;
 
-
         const posts = await PostModel
-        .find({ user: userId })
-        .sort({ createdAt: -1 })
-        .populate([
-            {
-                path: 'user',
-                model: UserModel,
-                select: '-password'
-            },
-            {
-                path: 'comments.user',
-                model: UserModel,
-                select: '-password'
-            }
-        ]);
+            .find({ user: userId })
+            .sort({ createdAt: -1 })
+            .populate(configPopulate);
 
         res.status(200).json(posts);
     }
@@ -113,72 +97,16 @@ export const likePost = async (req, res) => {
         const userId = req.tokenData._id;
 
         const post = await PostModel.findById(id);
+        if (!post) return res.status(404).json({ err: "post not found" });
 
         const isLiked = post.likes.get(userId);
-        if (isLiked) {
-            post.likes.delete(userId);
-        }
-        else {
-            post.likes.set(userId, true);
-        }
+        isLiked ? post.likes.delete(userId) : post.likes.set(userId, true);
 
-        post.markModified('likes');
-        await post.save();
-        
-        const updatedPost = await PostModel
-        .findById(id)
-        .populate([
-            {
-                path: 'user',
-                model: UserModel,
-                select: '-password'
-            },
-            {
-                path: 'comments.user',
-                model: UserModel,
-                select: '-password'
-            }
-        ]);
-
-        res.status(200).json(updatedPost);
-    }
-    catch (err) {
-        res.status(404).json({ message: err.message });
-    }
-};
-
-
-export const addComment = async (req, res) => {
-    try {
-        const { postId } = req.params;
-        const post = await PostModel.findById(postId);
-
-        const payload = {
-            body: req.body.body,
-            user: req.tokenData._id,
-            likes: {},
-            createdAt: new Date()
-        }
-
-        post.comments.push(payload);
-
-        post.markModified('comments');
         await post.save();
 
         const updatedPost = await PostModel
-        .findById(postId)
-        .populate([
-            {
-                path: 'user',
-                model: UserModel,
-                select: '-password'
-            },
-            {
-                path: 'comments.user',
-                model: UserModel,
-                select: '-password'
-            }
-        ]);
+            .findById(id)
+            .populate(configPopulate);
 
         res.status(200).json(updatedPost);
     }

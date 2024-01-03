@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -13,6 +14,7 @@ const verifyToken = async(req, res, next) => {
   try {
     const decodeToken = jwt.verify(token, process.env.TOKEN_SECRET);
     req.tokenData = decodeToken;
+    req.tokenData._id = new mongoose.Types.ObjectId(req.tokenData._id);  // maybe will cause errors
     next()
   }
   catch(err){

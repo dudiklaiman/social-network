@@ -1,4 +1,6 @@
 import {
+    FavoriteBorderOutlined,
+    FavoriteOutlined,
     EditOutlined,
     DeleteOutlined,
     AttachFileOutlined,
@@ -20,6 +22,7 @@ import {
 import FlexBetween from "src/components/FlexBetween";
 import UserImage from "src/components/UserImage";
 import WidgetWrapper from "src/components/WidgetWrapper";
+import { useDispatch, useSelector } from "react-redux";
 // import { useState } from "react";
 
 
@@ -28,13 +31,35 @@ const Comment = ({ comment }) => {
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
     const mediumMain = palette.neutral.mediumMain;
     const medium = palette.neutral.medium;
-    console.log(comment);
+    const loggedInUserId = useSelector((state) => state.user._id);
+    // const isLiked = Boolean(comment.likes[loggedInUserId]);
+    const isLiked = Boolean(comment.likes) && Boolean(comment.likes[loggedInUserId]);
+    const likeCount = comment?.likes ? Object.keys(comment.likes).length : 0;
+    // console.log(likeCount);
 
 
     return (
         <WidgetWrapper padding="1.5rem 0rem 0.75rem 0.5rem">
             <FlexBetween gap="1.5rem">
+
                 <UserImage image={comment.user.picturePath} size="40px" />
+
+                <Typography>
+                    Hello
+                </Typography>
+
+                {/* <FlexBetween gap="0.3rem">
+                    <IconButton onClick={patchLike} >
+                        {isLiked ? (
+                        <FavoriteOutlined sx={{ color: primary }} />
+                        ) : (
+                        <FavoriteBorderOutlined />
+                        )}
+                    </IconButton>
+                    <Typography>{likeCount}</Typography>
+                </FlexBetween> */}
+
+
                 {/* <InputBase
                     placeholder="Leave a comment..."
                     onChange={(e) => setBody(e.target.value)}
