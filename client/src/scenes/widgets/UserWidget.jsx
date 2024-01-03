@@ -16,15 +16,14 @@ import { apiGetWithToken } from "src/utils/apiRequests";
 
 
 const UserWidget = ({ userId, picturePath }) => {
-    const [currUser, setUser] = useState(null);
+    const [user, setUser] = useState(null);
     const { palette } = useTheme();
     const navigate = useNavigate();
     const token = useSelector((state) => state.token);
-    const user = useSelector((state) => state.user);
     const dark = palette.neutral.dark;
     const medium = palette.neutral.medium;
     const main = palette.neutral.main;
-    const fullDate = new Date(user.createdAt);
+    const fullDate = new Date(user?.createdAt);
     const months = { 1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December" };
     const date = `${months[fullDate.getMonth() + 1]} ${fullDate.getFullYear()}`;
 
@@ -35,10 +34,13 @@ const UserWidget = ({ userId, picturePath }) => {
     };
 
     useEffect(() => {
-        getUser();
+        const fetchData = async () => {
+            await getUser();
+        };
+        fetchData();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    if (!currUser) {
+    if (!user) {
         return null;
     }
 
@@ -50,7 +52,7 @@ const UserWidget = ({ userId, picturePath }) => {
         viewedProfile,
         impressions,
         friends,
-    } = currUser;
+    } = user;
 
     return (
         <WidgetWrapper>

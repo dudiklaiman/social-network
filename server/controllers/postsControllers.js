@@ -31,11 +31,19 @@ export const createPost = async (req, res) => {
         const allPosts = await PostModel
         .find()
         .sort({ createdAt: -1 })
-        .populate({
-            path: 'user',
-            model: UserModel,
-            select: '-password'
-        });
+        .populate([
+            {
+                path: 'user',
+                model: UserModel,
+                select: '-password'
+            },
+            {
+                path: 'comments.user',
+                model: UserModel,
+                select: '-password'
+            }
+        ]);
+        
         res.status(201).json(allPosts);
     }
     catch (err) {
@@ -49,11 +57,19 @@ export const getPostsFeed = async (req, res) => {
         const allPosts = await PostModel
         .find()
         .sort({ createdAt: -1 })
-        .populate({
-            path: 'user',
-            model: UserModel,
-            select: '-password'
-        });
+        .populate([
+            {
+                path: 'user',
+                model: UserModel,
+                select: '-password'
+            },
+            {
+                path: 'comments.user',
+                model: UserModel,
+                select: '-password'
+            }
+        ]);
+
         res.status(200).json(allPosts);
     }
     catch (err) {
@@ -70,11 +86,19 @@ export const getUserPosts = async (req, res) => {
         const posts = await PostModel
         .find({ user: userId })
         .sort({ createdAt: -1 })
-        .populate({
-            path: 'user',
-            model: UserModel,
-            select: '-password'
-        });
+        .populate([
+            {
+                path: 'user',
+                model: UserModel,
+                select: '-password'
+            },
+            {
+                path: 'comments.user',
+                model: UserModel,
+                select: '-password'
+            }
+        ]);
+
         res.status(200).json(posts);
     }
     catch (err) {
@@ -103,11 +127,58 @@ export const likePost = async (req, res) => {
         
         const updatedPost = await PostModel
         .findById(id)
-        .populate({
-            path: 'user',
-            model: UserModel,
-            select: '-password'
-        });
+        .populate([
+            {
+                path: 'user',
+                model: UserModel,
+                select: '-password'
+            },
+            {
+                path: 'comments.user',
+                model: UserModel,
+                select: '-password'
+            }
+        ]);
+
+        res.status(200).json(updatedPost);
+    }
+    catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+};
+
+
+export const addComment = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const post = await PostModel.findById(postId);
+
+        const payload = {
+            body: req.body.body,
+            user: req.tokenData._id,
+            likes: {},
+            createdAt: new Date()
+        }
+
+        post.comments.push(payload);
+
+        post.markModified('comments');
+        await post.save();
+
+        const updatedPost = await PostModel
+        .findById(postId)
+        .populate([
+            {
+                path: 'user',
+                model: UserModel,
+                select: '-password'
+            },
+            {
+                path: 'comments.user',
+                model: UserModel,
+                select: '-password'
+            }
+        ]);
 
         res.status(200).json(updatedPost);
     }

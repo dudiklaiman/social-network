@@ -16,6 +16,7 @@ import { setLogin } from "src/state/index";
 import FlexBetween from "src/components/FlexBetween";
 import { apiPost } from "src/utils/apiRequests";
 import { registerSchema, loginSchema } from "src/utils/validationShemas";
+import { compressImage } from "src/utils/utils";
 
 
 const initialValuesRegister = {
@@ -43,14 +44,17 @@ const Form = () => {
     const isLogin = pageType === "login";
     const isRegister = pageType === "register";
   
+    
     const register = async (values, onSubmitProps) => {
       const formData = new FormData();
       for (let value in values) {
-        formData.append(value, values[value]);
+        if (value == "picture") {
+          const compressedImage = await compressImage(values[value]);
+          formData.append("picture", compressedImage);
+        }
+        else formData.append(value, values[value]);
       }
-
       const savedUser = await apiPost("auth/register", formData, {'Content-Type': 'multipart/form-data'});
-
       onSubmitProps.resetForm();
   
       if (savedUser) {

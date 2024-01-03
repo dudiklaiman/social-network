@@ -12,6 +12,8 @@ import {
   import { useDispatch, useSelector } from "react-redux";
   import { setPost } from "src/state/index";
 import { apiPatchWithToken } from "src/utils/apiRequests";
+import NewComment from "./NewComment";
+import Comment from "src/components/Comment";
   
   const PostWidget = ({
     postId,
@@ -34,6 +36,7 @@ import { apiPatchWithToken } from "src/utils/apiRequests";
     const { palette } = useTheme();
     const main = palette.neutral.main;
     const primary = palette.primary.main;
+    
   
     const patchLike = async () => {
       const baseUrl = import.meta.env.VITE_URL;
@@ -46,7 +49,7 @@ import { apiPatchWithToken } from "src/utils/apiRequests";
       });
       const updatedPost = await response.json();
       // const data = await apiPatchWithToken(`posts/${postId}/like`, token);
-      // console.log(updatedPost);
+      // console.log(data);
       dispatch(setPost({ post: updatedPost }));
     };
   
@@ -95,16 +98,23 @@ import { apiPatchWithToken } from "src/utils/apiRequests";
             <ShareOutlined />
           </IconButton>
         </FlexBetween>
+        
         {isComments && (
           <Box mt="0.5rem">
-            {comments.map((comment, i) => (
-              <Box key={`${name}-${i}`}>
-                <Divider />
-                <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-                  {comment}
-                </Typography>
-              </Box>
-            ))}
+            <Divider />
+            <NewComment postId={postId} />
+            <Divider />
+            {comments.map((comment, i) => {
+              return (
+                <Box key={`${name}-${i}`}>
+                  {/* <Divider /> */}
+                  {/* <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
+                    {comment.body}
+                  </Typography> */}
+                  <Comment comment={comment} />
+                </Box>
+              );
+            })}
             <Divider />
           </Box>
         )}

@@ -25,7 +25,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "src/state/index";
 import { apiPostWithToken } from "src/utils/apiRequests";
-import imageCompression from 'browser-image-compression';
+import { compressImage } from "src/utils/utils";
 
 
 const MyPostWidget = ({ picturePath }) => {
@@ -45,20 +45,10 @@ const MyPostWidget = ({ picturePath }) => {
         const formData = new FormData();
         formData.append("description", description);
         if (image) {
-            try {
-                const options = {
-                    maxSizeMB: 10,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
-                }
-                const compressedImage = await imageCompression(image, options);
-                if (compressedImage.size > 10000000) return console.log(`image too large: (${compressedImage.size / 1024 / 1024} MB)`);
-                formData.append("picture", compressedImage);
-                
-            } catch (error) {
-                console.log(error);
-            }
+            const compressedImage = await compressImage(image);
+            formData.append("picture", compressedImage);
         }
+
         const allPosts = await apiPostWithToken("posts", token, formData, {'Content-Type': 'multipart/form-data'});
 
         dispatch(setPosts({ posts: allPosts }));
@@ -171,6 +161,9 @@ const MyPostWidget = ({ picturePath }) => {
                         color: palette.background.alt,
                         backgroundColor: palette.primary.main,
                         borderRadius: "3rem",
+                        "&:hover": {
+                            backgroundColor: palette.primary.dark,
+                        }
                     }}
                 >
                     POST
