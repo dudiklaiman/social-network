@@ -14,7 +14,7 @@ const verifyToken = async(req, res, next) => {
   try {
     const decodeToken = jwt.verify(token, process.env.TOKEN_SECRET);
     req.tokenData = decodeToken;
-    req.tokenData._id = new mongoose.Types.ObjectId(req.tokenData._id);  // maybe will cause errors
+    req.tokenData._id = new mongoose.Types.ObjectId(req.tokenData._id);
     next()
   }
   catch(err){

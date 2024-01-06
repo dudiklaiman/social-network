@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "src/scenes/navBar/NavBar";
 import FriendListWidget from "src/scenes/widgets/FriendListWidget";
 import MyPostWidget from "src/scenes/widgets/MyPostWidget";
-import PostsWidget2 from "src/scenes/widgets/PostsWidget2";
+import FeedWidget from "src/scenes/widgets/FeedWidget";
 import UserWidget from "src/scenes/widgets/UserWidget";
 import { apiGetWithToken } from "src/utils/apiRequests";
 
@@ -49,7 +49,7 @@ const ProfilePage = () => {
         >
           {/* <MyPostWidget picturePath={user.picturePath} /> */}
           {/* <Box m="0rem 0" /> */}
-          <PostsWidget2 userId={userId} isProfile />
+          <FeedWidget userId={userId} isProfile />
           
         </Box>
         {isNonMobileScreens && (

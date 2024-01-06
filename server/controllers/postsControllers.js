@@ -3,12 +3,14 @@ import PostModel from '../models/postModel.js'
 import UserModel from '../models/userModel.js';
 import { validateCreatePost } from '../services/postValidation.js'
 import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+dotenv.config();
 
 
-cloudinary.config({
-    cloud_name: 'dtk7xoyb4',
-    api_key: '911992345193834',
-    api_secret: 'ASs6JLTa5TKtfVTroWDw-ubmogs'
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.API_KEY, 
+    api_secret: process.env.API_SECRET, 
 });
 
 const configPopulate = [

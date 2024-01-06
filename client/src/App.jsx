@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import HomePage from './scenes/homePage/HomePage';
 import LoginPage from './scenes/loginPage/LoginPage';
 import ProfilePage from './scenes/profilePage/ProfilePage';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
@@ -13,21 +13,20 @@ import { setLogout, setMode } from './state';
 function App() {
   const dispatch = useDispatch();
 
-
   const mode = useSelector((state) => state.mode);
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (prefersDarkMode) {
-    dispatch(setMode({mode: "dark"}));
+    dispatch(setMode({ mode: "dark" }));
   }
   else {
-    dispatch(setMode({mode: "light"}));
+    dispatch(setMode({ mode: "light" }));
   }
-  
+
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const isAuth = useSelector((state) => state.tokenExpiration) > new Date().toISOString();
   if (!isAuth) dispatch(setLogout());
 
-  
+
 
   return (
     <div className='app'>

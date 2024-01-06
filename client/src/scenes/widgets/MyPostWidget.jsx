@@ -34,7 +34,6 @@ const MyPostWidget = ({ picturePath }) => {
     const [image, setImage] = useState(null);
     const [description, setDescription] = useState("");
     const { palette } = useTheme();
-    // const { _id } = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
     const mediumMain = palette.neutral.mediumMain;
@@ -52,9 +51,9 @@ const MyPostWidget = ({ picturePath }) => {
         const allPosts = await apiPostWithToken("posts", token, formData, {'Content-Type': 'multipart/form-data'});
 
         dispatch(setPosts({ posts: allPosts }));
+        setDescription("");
         setImage(null);
         setIsImage(false);
-        setDescription("");
     };
 
     return (
@@ -81,7 +80,7 @@ const MyPostWidget = ({ picturePath }) => {
                     p="1rem"
                 >
                     <Dropzone
-                        acceptedFiles=".jpg,.jpeg,.png"
+                        acceptedFiles=".jpg,.jpeg,.png,.heic"
                         multiple={false}
                         onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
                     >

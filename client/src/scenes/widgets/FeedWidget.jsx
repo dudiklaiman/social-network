@@ -5,7 +5,7 @@ import PostWidget from "./PostWidget";
 import { apiGetWithToken } from 'src/utils/apiRequests';
 
 
-const PostsWidget2 = ({ userId, isProfile }) => {
+const FeedWidget = ({ userId, isProfile }) => {
     const dispatch = useDispatch();
     const posts = useSelector((state) => state.posts);
     const token = useSelector((state) => state.token);
@@ -47,4 +47,4 @@ const PostsWidget2 = ({ userId, isProfile }) => {
     );
 };
 
-export default PostsWidget2;
+export default FeedWidget;

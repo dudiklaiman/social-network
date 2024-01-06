@@ -1,11 +1,6 @@
 import {
     EditOutlined,
     DeleteOutlined,
-    AttachFileOutlined,
-    GifBoxOutlined,
-    ImageOutlined,
-    MicOutlined,
-    MoreHorizOutlined,
 } from "@mui/icons-material";
 import {
     Box,
@@ -39,7 +34,7 @@ const NewComment = ({ postId }) => {
     const patchComment = async () => {
         const baseUrl = import.meta.env.VITE_URL;
         const response = await fetch(`${baseUrl}/posts/comments/${postId}`, {
-            method: "PATCH",
+            method: "POST",
             body: JSON.stringify({ body }),
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -62,6 +57,7 @@ const NewComment = ({ postId }) => {
                     onChange={(e) => setBody(e.target.value)}
                     value={body}
                     sx={{
+                        fontSize: "12px",
                         width: "100%",
                         height: "40px",
                         backgroundColor: palette.neutral.light,
@@ -76,7 +72,6 @@ const NewComment = ({ postId }) => {
                         color: palette.background.alt,
                         backgroundColor: palette.primary.main,
                         borderRadius: "3rem",
-                        height: "40px",
                         "&:hover": {
                             backgroundColor: palette.primary.dark,
                         }

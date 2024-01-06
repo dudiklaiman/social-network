@@ -1,4 +1,6 @@
 import imageCompression from 'browser-image-compression';
+import ImageConversion from 'image-conversion';
+import { formatDistanceToNow } from "date-fns";
 
 
 export const compressImage = async (image) => {
@@ -16,4 +18,9 @@ export const compressImage = async (image) => {
     catch (error) {
         console.log(error);
     }
+}
+
+
+export const formatTimePassed = (date) => {
+    return formatDistanceToNow(date, { addSuffix: true });
 }

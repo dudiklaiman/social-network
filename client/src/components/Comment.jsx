@@ -1,21 +1,12 @@
 import {
     FavoriteBorderOutlined,
     FavoriteOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    AttachFileOutlined,
-    GifBoxOutlined,
-    ImageOutlined,
-    MicOutlined,
-    MoreHorizOutlined,
 } from "@mui/icons-material";
 import {
     Box,
     Divider,
     Typography,
-    InputBase,
     useTheme,
-    Button,
     IconButton,
     useMediaQuery,
 } from "@mui/material";
@@ -23,32 +14,86 @@ import FlexBetween from "src/components/FlexBetween";
 import UserImage from "src/components/UserImage";
 import WidgetWrapper from "src/components/WidgetWrapper";
 import { useDispatch, useSelector } from "react-redux";
-// import { useState } from "react";
+import { setPost } from "src/state";
+import { formatTimePassed } from "src/utils/utils";
+import { useNavigate } from "react-router-dom";
 
 
-const Comment = ({ comment }) => {
+const Comment = ({ 
+    postUserId,
+    commentId, 
+    commentBody,
+    likes,
+    userName,
+    userPicturePath,
+    createdAt 
+}) => {
     const { palette } = useTheme();
-    const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
-    const mediumMain = palette.neutral.mediumMain;
+    const primary = palette.primary.main;
+    const main = palette.neutral.main;
     const medium = palette.neutral.medium;
     const loggedInUserId = useSelector((state) => state.user._id);
-    // const isLiked = Boolean(comment.likes[loggedInUserId]);
-    const isLiked = Boolean(comment.likes) && Boolean(comment.likes[loggedInUserId]);
-    const likeCount = comment?.likes ? Object.keys(comment.likes).length : 0;
-    // console.log(likeCount);
+    const isLiked = Boolean(likes[loggedInUserId]);
+    const likeCount = Object.keys(likes).length;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const token = useSelector((state) => state.token);
+    let commentDate = formatTimePassed(createdAt);
+    if (commentDate.includes("about")) commentDate = commentDate.replace("about", "");
+
+
+    const patchLike = async () => {
+        const baseUrl = import.meta.env.VITE_URL;
+        const response = await fetch(`${baseUrl}/posts/comments/${commentId}/like`, {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const updatedPost = await response.json();
+        // const data = await apiPatchWithToken(`posts/${postId}/like`, token);
+        // console.log(data);
+        dispatch(setPost({ post: updatedPost }));
+      };
 
 
     return (
         <WidgetWrapper padding="1.5rem 0rem 0.75rem 0.5rem">
-            <FlexBetween gap="1.5rem">
+            <FlexBetween sx={{alignItems: "flex-start",}}>
+                <FlexBetween gap="1.5rem" sx={{alignItems: "flex-start"}}>
+                    <UserImage image={userPicturePath} size="40px" sx={{cursor: "pointer"}} onClick={() => navigate(`/profile/${postUserId}`)} />
 
-                <UserImage image={comment.user.picturePath} size="40px" />
+                    <Box>
+                        <FlexBetween gap="0.7rem" sx={{justifyContent: "left"}}>
+                            <Typography
+                                onClick={() => navigate(`/profile/${postUserId}`)}
+                                variant="h5"
+                                fontSize="0.8rem"
+                                fontWeight="500"
+                                sx={{
+                                  "&:hover": {
+                                    color: palette.primary.dark,
+                                    cursor: "pointer",
+                                  },
+                                }}
+                            >{userName}</Typography>
+                            <Typography
+                                color={medium}
+                                variant="h5"
+                                fontSize="0.8rem"
+                                fontWeight="100"
+                            >{commentDate}</Typography>
+                        </FlexBetween>
 
-                <Typography>
-                    Hello
-                </Typography>
+                        <Typography
+                            color={main}
+                            pt="5px"
+                        >{commentBody}</Typography>
+                    </Box>
+                </FlexBetween>
 
-                {/* <FlexBetween gap="0.3rem">
+                <FlexBetween gap="0.3rem" >
                     <IconButton onClick={patchLike} >
                         {isLiked ? (
                         <FavoriteOutlined sx={{ color: primary }} />
@@ -57,37 +102,8 @@ const Comment = ({ comment }) => {
                         )}
                     </IconButton>
                     <Typography>{likeCount}</Typography>
-                </FlexBetween> */}
+                </FlexBetween>
 
-
-                {/* <InputBase
-                    placeholder="Leave a comment..."
-                    onChange={(e) => setBody(e.target.value)}
-                    value={body}
-                    sx={{
-                        width: "100%",
-                        height: "40px",
-                        backgroundColor: palette.neutral.light,
-                        borderRadius: "2rem",
-                        padding: "1rem 2rem",
-                    }}
-                /> */}
-                {/* <Button
-                    disabled={!body}
-                    onClick={patchComment}
-                    sx={{
-                        color: palette.background.alt,
-                        backgroundColor: palette.primary.main,
-                        borderRadius: "3rem",
-                        height: "40px",
-                        "&:hover": {
-                            backgroundColor: palette.primary.dark,
-                        }
-                        
-                    }}
-                    >
-                    POST
-                </Button> */}
             </FlexBetween>
         </WidgetWrapper>
     );

@@ -10,8 +10,8 @@ const UserSchema = new mongoose.Schema({
     friends: Array,
     location: String,
     occupation: String,
-    viewedProfile: Number,
-    impressions: Number,
+    // viewedProfile: Number,
+    // impressions: Number,
 }, { timestamps: true, versionKey: false })
 
 const UserModel = mongoose.model('users', UserSchema);

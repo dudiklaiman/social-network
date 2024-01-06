@@ -13,19 +13,8 @@ const FriendListWidget = ({ userId }) => {
   const friends = useSelector((state) => state.user.friends);
 
   const getFriends = async () => {
-    // const response = await fetch(
-    //   `http://localhost:3001/users/${userId}/friends`,
-    //   {
-    //     method: "GET",
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   }
-    // );
-    // const data = await response.json();
     const data = await apiGetWithToken(`users/${userId}/friends`, token)
-    // console.log(friends);
-    // console.log(data);
     dispatch(setFriends({ friends: data }));
-    // console.log(Object.values(friends));
   };
 
   useEffect(() => {
@@ -43,8 +32,7 @@ const FriendListWidget = ({ userId }) => {
         Friend List
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
-        {/* Consider to remove object.values */}
-        {Object.values(friends).map((friend) => (
+        {friends.map((friend) => (
           <Friend
             key={friend._id}
             friendId={friend._id}

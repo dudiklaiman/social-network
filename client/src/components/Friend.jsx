@@ -37,7 +37,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
       }
     );
     const data = await response.json();
-    console.log(data);
     dispatch(setFriends({ friends: data }));
   };
 
@@ -57,7 +56,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
             fontWeight="500"
             sx={{
               "&:hover": {
-                color: palette.primary.light,
+                // color: palette.primary.light,
+                color: palette.primary.dark,
                 cursor: "pointer",
               },
             }}
