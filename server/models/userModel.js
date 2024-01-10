@@ -2,16 +2,13 @@ import mongoose from 'mongoose';
 
 
 const UserSchema = new mongoose.Schema({
-    firstName: String,
-    lastName: String,
+    name: String,
     email: String,
     password: String,
     picturePath: String,
-    friends: Array,
+    friends: [{ type: mongoose.Schema.Types.ObjectId }],
     location: String,
     occupation: String,
-    // viewedProfile: Number,
-    // impressions: Number,
 }, { timestamps: true, versionKey: false })
 
 const UserModel = mongoose.model('users', UserSchema);

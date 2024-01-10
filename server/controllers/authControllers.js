@@ -30,7 +30,7 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
         await user.save();
-        user.password = "********";
+        user.password = '*'.repeat(req.body.password.length);
 
         res.status(201).json(user);
     }
@@ -53,9 +53,9 @@ export const login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials. " });
 
         const token = createToken(user.id);
-        user.password = "********"
+        user.password = '*'.repeat(req.body.password.length);
 
-        res.status(200).json({user, token});
+        res.status(200).json({ token, user });
     }
     catch (err) {
         res.status(500).json({err})

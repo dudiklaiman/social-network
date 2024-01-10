@@ -21,5 +21,5 @@ export const compressImage = async (image) => {
 
 
 export const formatTimePassed = (date) => {
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNow(date, { addSuffix: true }).replace("about", "");
 }

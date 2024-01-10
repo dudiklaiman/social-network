@@ -20,8 +20,7 @@ import { compressImage } from "src/utils/utils";
 
 
 const initialValuesRegister = {
-  firstName: "",
-  lastName: "",
+  name: "",
   email: "",
   password: "",
   location: "",
@@ -104,29 +103,39 @@ const Form = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
+            <TextField
+                label="Email"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.email}
+                name="email"
+                error={Boolean(touched.email) && Boolean(errors.email)}
+                helperText={touched.email && errors.email}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                label="Password"
+                type="password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.password}
+                name="password"
+                error={Boolean(touched.password) && Boolean(errors.password)}
+                helperText={touched.password && errors.password}
+                sx={{ gridColumn: "span 4" }}
+              />
+
               {isRegister && (
                 <>
                   <TextField
-                    label="First Name"
+                    label="Full Name"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.firstName}
-                    name="firstName"
-                    error={
-                      Boolean(touched.firstName) && Boolean(errors.firstName)
-                    }
-                    helperText={touched.firstName && errors.firstName}
-                    sx={{ gridColumn: "span 2" }}
-                  />
-                  <TextField
-                    label="Last Name"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.lastName}
-                    name="lastName"
-                    error={Boolean(touched.lastName) && Boolean(errors.lastName)}
-                    helperText={touched.lastName && errors.lastName}
-                    sx={{ gridColumn: "span 2" }}
+                    value={values.name}
+                    name="name"
+                    error={Boolean(touched.name) && Boolean(errors.name)}
+                    helperText={touched.name && errors.name}
+                    sx={{ gridColumn: "span 4" }}
                   />
                   <TextField
                     label="Location"
@@ -185,28 +194,6 @@ const Form = () => {
                   </Box>
                 </>
               )}
-  
-              <TextField
-                label="Email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={Boolean(touched.email) && Boolean(errors.email)}
-                helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                label="Password"
-                type="password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.password}
-                name="password"
-                error={Boolean(touched.password) && Boolean(errors.password)}
-                helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 4" }}
-              />
             </Box>
   
             {/* BUTTONS */}

@@ -33,13 +33,14 @@ const FeedWidget = ({ userId, isProfile }) => {
                         key={post._id}
                         postId={post._id}
                         postUserId={currUser._id}
-                        name={`${currUser.firstName} ${currUser.lastName}`}
+                        name={`${currUser.name}`}
                         description={post.description}
                         location={currUser.location}
                         picturePath={post.picturePath}
                         userPicturePath={currUser.picturePath}
                         likes={post.likes}
                         comments={post.comments}
+                        createdAt={post.createdAt}
                     />
                 );
             })}

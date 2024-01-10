@@ -14,9 +14,10 @@ import { setPost } from "src/state/index";
 import { apiPatchWithToken } from "src/utils/apiRequests";
 import NewComment from "./NewComment";
 import Comment from "src/components/Comment";
+import { formatTimePassed } from "src/utils/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { ToastContainer, toast } from "../../../node_modules/react-toastify";
-import '../../../node_modules/react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const PostWidget = ({
@@ -29,6 +30,7 @@ const PostWidget = ({
   userPicturePath,
   likes,
   comments,
+  createdAt
 }) => {
   const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
@@ -41,6 +43,7 @@ const PostWidget = ({
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
+  const commentDate = formatTimePassed(createdAt);
 
 
   const patchLike = async () => {
@@ -65,7 +68,7 @@ const PostWidget = ({
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle={location}
+        subtitle={commentDate}
         userPicturePath={userPicturePath}
       />
 
@@ -124,7 +127,7 @@ const PostWidget = ({
               commentId={comment._id}
               commentBody={comment.body}
               likes={comment.likes}
-              userName={`${comment.user.firstName} ${comment.user.lastName}`}
+              userName={`${comment.user.name}`}
               userPicturePath={comment.user.picturePath}
               createdAt={comment.createdAt}
             />
@@ -136,7 +139,7 @@ const PostWidget = ({
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
-        closeOnClick
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss={false}
         draggable

@@ -38,8 +38,7 @@ const Comment = ({
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const token = useSelector((state) => state.token);
-    let commentDate = formatTimePassed(createdAt);
-    if (commentDate.includes("about")) commentDate = commentDate.replace("about", "");
+    const commentDate = formatTimePassed(createdAt);
 
 
     const patchLike = async () => {
@@ -55,7 +54,7 @@ const Comment = ({
         // const data = await apiPatchWithToken(`posts/${postId}/like`, token);
         // console.log(data);
         dispatch(setPost({ post: updatedPost }));
-      };
+    };
 
 
     return (

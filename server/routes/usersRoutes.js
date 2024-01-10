@@ -1,12 +1,13 @@
 import express from 'express'
 import verifyToken from '../middlewares/auth.js'
-import { getUser, getUserFriends, addRemoveFriend } from '../controllers/usersControllers.js';
+import { getUser, searchUsers, getUserFriends, addRemoveFriend } from '../controllers/usersControllers.js';
 
 const router = express.Router();
 
-router.get('/:id', verifyToken, getUser);
-router.get('/:id/friends', verifyToken, getUserFriends);
-router.patch('/:id/:friendId', verifyToken, addRemoveFriend);
+router.get('/search', verifyToken, searchUsers);
+router.get('/:userId', verifyToken, getUser);
+router.get('/:userId/friends', verifyToken, getUserFriends);
+router.patch('/:userId/:friendId', verifyToken, addRemoveFriend);
 
 
 export default router;
