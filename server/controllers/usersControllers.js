@@ -23,7 +23,7 @@ export const searchUsers = async (req, res) => {
           { name: { $regex: query, $options: 'i' } }
         ],
       })
-      .select('name location occupation');
+      .select('name picturePath');
   
       res.status(200).json(users);
     }

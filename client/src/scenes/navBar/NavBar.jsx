@@ -70,31 +70,8 @@ const NavBar = () => {
         >
           Social Network
         </Typography>
-        {isNonMobileScreens && (
-          <>
-            <SearchWidget onSearch={handleSearch} />
-            {/* <Paper style={{ maxHeight: "200px", overflowY: "auto" }}>
-              <List>
-                {searchResults.map((user) => (
-                  <ListItem key={user._id}>
-                    {user.name}
-                  </ListItem>
-                ))}
-              </List>
-            </Paper> */}
-          </>
-          // <FlexBetween
-          //   backgroundColor={neutralLight}
-          //   borderRadius="9px"
-          //   gap="3rem"
-          //   padding="0.1rem 1.5rem"
-          // >
-          //   <InputBase placeholder="Search..." />
-          //   <IconButton>
-          //     <Search />
-          //   </IconButton>
-          // </FlexBetween>
-        )}
+        
+        {isNonMobileScreens && <SearchWidget />}
     </FlexBetween>
 
       {/* DESKTOP NAV */ }
