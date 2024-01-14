@@ -4,8 +4,17 @@ import UserModel from '../models/userModel.js';
 export const getUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const user = await UserModel.findById(userId);
-        user.password = "********";
+        const user = await UserModel
+        .findById(userId)
+        .select("-password")
+        .populate(
+            {
+                path: 'friends',
+                model: UserModel,
+                select: '-password'
+            },
+        );
+
         res.status(200).json(user);
     }
     catch (err) {
@@ -16,19 +25,26 @@ export const getUser = async (req, res) => {
 
 export const searchUsers = async (req, res) => {
     try {
-      const { query } = req.query;
-      const users = await UserModel
-      .find({
-        $or: [
-          { name: { $regex: query, $options: 'i' } }
-        ],
-      })
-      .select('name picturePath');
-  
-      res.status(200).json(users);
+        const { query } = req.query;
+        const users = await UserModel
+            .find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } }
+                ],
+            })
+            .select('name picturePath');
+
+        // Sort the results based on name similarity to the query
+        users.sort((a, b) => {
+            const scoreA = a.name.toLowerCase().startsWith(query.toLowerCase()) ? 2 : 1;
+            const scoreB = b.name.toLowerCase().startsWith(query.toLowerCase()) ? 2 : 1;
+            return scoreB - scoreA; // Sort in descending order
+        });
+
+        res.status(200).json(users);
     }
     catch (err) {
-      res.status(404).json({ message: err.message });
+        res.status(404).json({ message: err.message });
     }
 };
 
@@ -67,7 +83,7 @@ export const addRemoveFriend = async (req, res) => {
             user.friends.push(friend._id);
             friend.friends.push(user._id);
         }
- 
+
         await user.save();
         await friend.save();
 

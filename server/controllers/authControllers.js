@@ -29,6 +29,7 @@ export const register = async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
+        user.email = user.email.toLowerCase();
         await user.save();
         user.password = '*'.repeat(req.body.password.length);
 
@@ -46,7 +47,7 @@ export const login = async (req, res) => {
     if (validBody.error) return res.status(400).json(validBody.error.details);
 
     try {
-        const user = await UserModel.findOne({ email: req.body.email });
+        const user = await UserModel.findOne({ email: req.body.email.toLowerCase() });
         if (!user) return res.status(400).json({ msg: "User does not exist" });
 
         const isMatch = await bcrypt.compare(req.body.password, user.password);

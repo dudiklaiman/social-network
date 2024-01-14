@@ -1,4 +1,4 @@
-import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
+import { PersonAddOutlined, PersonRemoveOutlined, AccountCircle } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -7,21 +7,19 @@ import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
 
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize="55px" }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { _id } = useSelector((state) => state.user);
-  const token = useSelector((state) => state.token);
-  const friends = useSelector((state) => state.user.friends);
-  // console.log(friends);
-
   const { palette } = useTheme();
+
+  const { _id, friends } = useSelector((state) => state.user);
+  const token = useSelector((state) => state.token);
+  const isFriend = friends.find((friend) => friend._id === friendId);
+
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-
-  const isFriend = friends.find((friend) => friend._id === friendId);
 
 
   const patchFriend = async () => {
@@ -43,7 +41,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+        <UserImage image={userPicturePath} size={userPicturePathSize} />
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);
