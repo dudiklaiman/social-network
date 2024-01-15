@@ -1,23 +1,20 @@
-import {
-  ChatBubbleOutlineOutlined,
-  FavoriteBorderOutlined,
-  FavoriteOutlined,
-  ShareOutlined,
-} from "@mui/icons-material";
-import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-import FlexBetween from "src/components/FlexBetween";
-import Friend from "src/components/Friend";
-import WidgetWrapper from "src/components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "src/state/index";
-import { apiPatchWithToken } from "src/utils/apiRequests";
-import NewComment from "./NewComment";
-import Comment from "src/components/Comment";
-import { formatTimePassed } from "src/utils/utils";
+import { setPost } from "src/state/authSlice";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, FavoriteOutlined, ShareOutlined } from "@mui/icons-material";
+import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
+
+import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
+import FlexBetween from "src/components/utilComponents/FlexBetween";
+import Friend from "src/components/Friend";
+import NewComment from "src/components/NewComment";
+import Comment from "src/components/Comment";
+import { formatTimePassed } from "src/utils/utils";
+import api from "src/utils/apiRequests";
 
 
 const PostWidget = ({
@@ -32,38 +29,28 @@ const PostWidget = ({
   comments,
   createdAt
 }) => {
-  const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
+  const { palette } = useTheme();
+
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
+  const [isComments, setIsComments] = useState(false);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
-
-  const mode = useSelector((state) => state.mode);
-  const { palette } = useTheme();
-  const main = palette.neutral.main;
-  const primary = palette.primary.main;
   const commentDate = formatTimePassed(createdAt);
 
+  const mode = useSelector((state) => state.mode);
+  const main = palette.neutral.main;
+  const primary = palette.primary.main;
 
-  const patchLike = async () => {
-    const baseUrl = import.meta.env.VITE_URL;
-    const response = await fetch(`${baseUrl}/posts/${postId}/like`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const updatedPost = await response.json();
-    // const data = await apiPatchWithToken(`posts/${postId}/like`, token);
-    // console.log(data);
+
+  const handleLike = async () => {
+    const updatedPost = (await api(token).patch(`posts/${postId}/like`)).data;
     dispatch(setPost({ post: updatedPost }));
   };
 
-
   return (
-    <WidgetWrapper m="2rem 0">
+    <WidgetWrapper my="2rem">
 
       <Friend
         friendId={postUserId}
@@ -72,7 +59,9 @@ const PostWidget = ({
         userPicturePath={userPicturePath}
       />
 
-      <Typography color={main} sx={{ mt: "1rem" }}>{description}</Typography>
+      <Typography color={main} sx={{ mt: "1rem" }}>
+        {description}
+      </Typography>
 
       {picturePath && (
         <img
@@ -89,7 +78,7 @@ const PostWidget = ({
 
           {/* Like button */}
           <FlexBetween gap="0.3rem">
-            <IconButton onClick={patchLike} >
+            <IconButton onClick={handleLike} >
               {isLiked ? (
                 <FavoriteOutlined sx={{ color: primary }} />
               ) : (
@@ -108,6 +97,7 @@ const PostWidget = ({
           </FlexBetween>
         </FlexBetween>
 
+        {/* Share button */}
         <IconButton>
           <CopyToClipboard text={`${window.location.href}`} onCopy={() => toast("Coppied to clipboard")} >
             <ShareOutlined />
@@ -115,6 +105,7 @@ const PostWidget = ({
         </IconButton>
       </FlexBetween>
 
+      {/* Comment section */}
       {isComments && (
         <Box mt="0.5rem">
           <Divider />
@@ -134,6 +125,8 @@ const PostWidget = ({
           ))}
         </Box>
       )}
+
+      {/* Notification on share */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -142,10 +135,11 @@ const PostWidget = ({
         closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss={false}
-        draggable
+        draggable={true}
         pauseOnHover={false}
         theme={mode}
       />
+      
     </WidgetWrapper>
   );
 };

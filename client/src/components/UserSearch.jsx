@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+
 import { Box, useTheme, IconButton, InputBase, Paper } from "@mui/material";
-import Search from "@mui/icons-material/Search";
-import WidgetWrapper from "src/components/WidgetWrapper";
+import { Search } from "@mui/icons-material";
+
+import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import Friend from "src/components/Friend";
-import { apiGetWithToken } from "src/utils/apiRequests";
+import api from "src/utils/apiRequests";
 
 
 const UserSearch = ({ isMobile }) => {
@@ -23,7 +25,7 @@ const UserSearch = ({ isMobile }) => {
     if (text == "") return setSearchResults([]);
 
     try {
-      const data = await apiGetWithToken(`users/search?query=${text}`, token);
+      const data = (await api(token).get(`users/search?query=${text}`)).data;
       setSearchResults(data.filter(user => user._id != loggedInUserId));
     }
     catch (error) {
@@ -43,25 +45,28 @@ const UserSearch = ({ isMobile }) => {
         gap="3rem"
         padding="0.1rem 0.5rem"
       >
+
         <InputBase
-          style={{ width: "100%" }}
+          sx={{ width: "100%" }}
           placeholder="Search users..."
           value={searchText}
           onChange={(e) => handleSearchChange(e.target.value)}
           startAdornment={<IconButton><Search /></IconButton>}
         />
-        <Paper style={{ "maxHeight": "8rem", overflow: "auto", backgroundColor: neutralLight, boxShadow: "none", backgroundImage: "none" }}>
+
+        <Paper sx={{ maxHeight: isMobile ? "14rem" : "8rem", marginBottom: (searchResults.length > 0) && "0.5rem", overflow: "auto", backgroundColor: neutralLight, boxShadow: "none", backgroundImage: "none" }}>
           {searchResults.map((user) => (
-            <div key={user._id} style={{ padding: "0.2rem 0.5rem" }}>
+            <Box key={user._id} p="0.2rem 0.5rem" >
               <Friend
                 friendId={user._id}
                 name={`${user.name}`}
                 userPicturePath={user.picturePath}
                 userPicturePathSize="35px"
               />
-            </div>
+            </Box>
           ))}
         </Paper>
+
       </Box>
     </WidgetWrapper>
   );

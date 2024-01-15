@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { switchMode, setLogout } from "../state/authSlice";
+import { useNavigate } from "react-router-dom";
+
 import {
   Box,
   IconButton,
@@ -9,14 +13,8 @@ import {
   FormControl,
   useTheme,
   useMediaQuery,
-  List,
-  ListItem,
-  Paper,
-  Autocomplete,
-  TextField,
 } from "@mui/material";
 import {
-  Search,
   Message,
   DarkMode,
   LightMode,
@@ -25,33 +23,26 @@ import {
   Menu,
   Close,
 } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import { switchMode, setLogout } from "../../state/index";
-import { useNavigate } from "react-router-dom";
-import FlexBetween from "../../components/FlexBetween";
-import SearchWidget from "src/scenes/widgets/UserSearch";
+
+import FlexBetween from "./utilComponents/FlexBetween";
+import UserSearch from "src/components/UserSearch";
+
 
 const NavBar = () => {
-  const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { palette } = useTheme();
+
   const user = useSelector((state) => state.user);
+  const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const neutralLight = palette.neutral.light;
+  const dark = palette.neutral.dark;
+  const background = palette.background.default;
+  const primaryLight = palette.primary.light;
+  const alt = palette.background.alt;
 
-  const theme = useTheme();
-  const neutralLight = theme.palette.neutral.light;
-  const dark = theme.palette.neutral.dark;
-  const background = theme.palette.background.default;
-  const primaryLight = theme.palette.primary.light;
-  const alt = theme.palette.background.alt;
-  const [searchResults, setSearchResults] = useState([]);
-
-
-  const handleSearch = (results) => {
-    setSearchResults(results);
-  };
-
-  // const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -71,7 +62,8 @@ const NavBar = () => {
           Social Network
         </Typography>
 
-        {isNonMobileScreens && <SearchWidget />}
+        {isNonMobileScreens && <UserSearch />}
+
       </FlexBetween>
 
       {/* DESKTOP NAV */}
@@ -161,7 +153,7 @@ const NavBar = () => {
                 <LightMode sx={{ color: dark, fontSize: "25px" }} />
               )}
             </IconButton> */}
-              <SearchWidget isMobile />
+              <UserSearch isMobile />
               <Message sx={{ fontSize: "25px" }} />
               <Notifications sx={{ fontSize: "25px" }} />
               <Help sx={{ fontSize: "25px" }} />

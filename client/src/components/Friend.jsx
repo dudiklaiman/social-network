@@ -1,13 +1,16 @@
-import { PersonAddOutlined, PersonRemoveOutlined, AccountCircle } from "@mui/icons-material";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import { setFriends } from "src/state/authSlice";
 import { useNavigate } from "react-router-dom";
-import { setFriends } from "src/state/index";
-import FlexBetween from "./FlexBetween";
-import UserImage from "./UserImage";
+
+import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
+
+import FlexBetween from "src/components/utilComponents/FlexBetween";
+import UserImage from "src/components/utilComponents/UserImage";
+import api from "src/utils/apiRequests";
 
 
-const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize="55px" }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize = "55px" }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { palette } = useTheme();
@@ -22,20 +25,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
   const medium = palette.neutral.medium;
 
 
-  const patchFriend = async () => {
-    const URL = import.meta.env.VITE_URL;
-    const response = await fetch(
-      `${URL}/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+  const handleAddRemoveFriend = async () => {
+    const updatedFriends = (await api(token).patch(`users/${_id}/${friendId}`)).data;
+    dispatch(setFriends({ friends: updatedFriends }));
   };
 
   return (
@@ -43,10 +35,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
       <FlexBetween gap="1rem">
         <UserImage image={userPicturePath} size={userPicturePathSize} />
         <Box
-          onClick={() => {
-            navigate(`/profile/${friendId}`);
-            navigate(0);
-          }}
+          onClick={() => navigate(`/profile/${friendId}`)}
         >
           <Typography
             color={main}
@@ -54,7 +43,6 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
             fontWeight="500"
             sx={{
               "&:hover": {
-                // color: palette.primary.light,
                 color: palette.primary.dark,
                 cursor: "pointer",
               },
@@ -69,17 +57,17 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
       </FlexBetween>
       {_id != friendId && (
         <IconButton
-        onClick={() => patchFriend()}
-        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-      >
-        {isFriend ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
-        )}
-      </IconButton>
+          onClick={() => handleAddRemoveFriend()}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          {isFriend ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
+        </IconButton>
       )}
-      
+
     </FlexBetween>
   );
 };

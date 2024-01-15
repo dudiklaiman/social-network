@@ -21,9 +21,9 @@ export const authSlice = createSlice({
         setLogin: (state, action) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
+            
             const days = 14;
-            const futureDate = new Date(new Date().getTime() + days * 24 * 60 * 60 * 1000); // Add 14 days (in milliseconds)
-            // const futureDate = new Date(new Date().getTime() + 1 * 60 * 1000); // Add 14 days (in milliseconds)
+            const futureDate = new Date(new Date().getTime() + (days * 24 * 60 * 60 * 1000)); // Add 14 days (in milliseconds)
             const futureISOString = futureDate.toISOString();
             state.tokenExpiration = futureISOString;
         },
@@ -34,13 +34,8 @@ export const authSlice = createSlice({
             state.tokenExpiration = null;
         },
         setFriends: (state, action) => {
-            // if (!state.user) return console.error("user friends non-existent :(");
-            // state.user.friends = action.payload.friends;
-            if (state.user) {
-                state.user.friends = action.payload.friends;
-            } else {
-                console.error("user friends non-existent :(");
-            }
+            if (!state.user) return console.error("user friends non-existent");
+            state.user.friends = action.payload.friends;
         },
         setPosts: (state, action) => {
             state.posts = action.payload.posts;

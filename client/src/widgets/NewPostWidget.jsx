@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "src/state/authSlice";
+import Dropzone from "react-dropzone";
+
 import {
     EditOutlined,
     DeleteOutlined,
@@ -17,24 +22,23 @@ import {
     IconButton,
     useMediaQuery,
 } from "@mui/material";
-import FlexBetween from "src/components/FlexBetween";
-import Dropzone from "react-dropzone";
-import UserImage from "src/components/UserImage";
-import WidgetWrapper from "src/components/WidgetWrapper";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "src/state/index";
-import { apiPostWithToken } from "src/utils/apiRequests";
+
+import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
+import FlexBetween from "src/components/utilComponents/FlexBetween";
+import UserImage from "src/components/utilComponents/UserImage";
 import { compressImage } from "src/utils/utils";
+import api from "src/utils/apiRequests";
 
 
-const MyPostWidget = ({ picturePath }) => {
+const NewPostWidget = ({ picturePath }) => {
     const dispatch = useDispatch();
+    const { palette } = useTheme();
+
+    const token = useSelector((state) => state.token);
+    const [description, setDescription] = useState("");
     const [isImage, setIsImage] = useState(false);
     const [image, setImage] = useState(null);
-    const [description, setDescription] = useState("");
-    const { palette } = useTheme();
-    const token = useSelector((state) => state.token);
+
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
     const mediumMain = palette.neutral.mediumMain;
     const medium = palette.neutral.medium;
@@ -48,7 +52,7 @@ const MyPostWidget = ({ picturePath }) => {
             formData.append("picture", compressedImage);
         }
 
-        const allPosts = await apiPostWithToken("posts", token, formData, {'Content-Type': 'multipart/form-data'});
+        const allPosts = (await api(token, { 'Content-Type': 'multipart/form-data' }).post("posts", formData)).data;
 
         dispatch(setPosts({ posts: allPosts }));
         setDescription("");
@@ -172,4 +176,4 @@ const MyPostWidget = ({ picturePath }) => {
     );
 };
 
-export default MyPostWidget;
+export default NewPostWidget;

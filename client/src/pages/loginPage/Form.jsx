@@ -12,9 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { setLogin } from "src/state/index";
-import FlexBetween from "src/components/FlexBetween";
-import { apiPost } from "src/utils/apiRequests";
+import { setLogin } from "src/state/authSlice";
+import FlexBetween from "src/components/utilComponents/FlexBetween";
+import api from "src/utils/apiRequests";
 import { registerSchema, loginSchema } from "src/utils/validationShemas";
 import { compressImage } from "src/utils/utils";
 
@@ -53,7 +53,9 @@ const Form = () => {
         }
         else formData.append(value, values[value]);
       }
-      const savedUser = await apiPost("auth/register", formData, {'Content-Type': 'multipart/form-data'});
+
+      // const savedUser = await apiPost("auth/register", formData, {'Content-Type': 'multipart/form-data'});
+      const savedUser = (await api("", {'Content-Type': 'multipart/form-data'}).post("auth/register", formData)).data;
       onSubmitProps.resetForm();
   
       if (savedUser) {
@@ -62,7 +64,9 @@ const Form = () => {
     };
   
     const login = async (values, onSubmitProps) => {
-      const { user, token } = await apiPost("auth/login", values);
+      // const { user, token } = await apiPost("auth/login", values);
+      const { user, token } = (await api().post("auth/login", values)).data;
+
 
       onSubmitProps.resetForm();
       if (user && token) {

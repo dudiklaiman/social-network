@@ -1,25 +1,29 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import Friend from "src/components/Friend";
-import WidgetWrapper from "src/components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "src/state/index";
-import { apiGetWithToken } from "src/utils/apiRequests";
+import { setFriends } from "src/state/authSlice";
+import { Box, Typography, useTheme } from "@mui/material";
+
+import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
+import Friend from "src/components/Friend";
+import api from "src/utils/apiRequests";
+
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
+
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
 
-  const getFriends = async () => {
-    const data = await apiGetWithToken(`users/${userId}/friends`, token)
-    dispatch(setFriends({ friends: data }));
-  };
 
   useEffect(() => {
+    const getFriends = async () => {
+      const friends = (await api(token).get(`users/${userId}/friends`)).data;
+      dispatch(setFriends({ friends }));
+    }
     getFriends();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   return (
     <WidgetWrapper>
@@ -31,6 +35,7 @@ const FriendListWidget = ({ userId }) => {
       >
         Friend List
       </Typography>
+
       <Box display="flex" flexDirection="column" gap="1.5rem">
         {friends.map((friend) => (
           <Friend
