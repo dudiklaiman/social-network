@@ -37,7 +37,7 @@ const PostWidget = ({
   const [isComments, setIsComments] = useState(false);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
-  const commentDate = formatTimePassed(createdAt);
+  const postDate = formatTimePassed(createdAt);
 
   const mode = useSelector((state) => state.mode);
   const main = palette.neutral.main;
@@ -55,7 +55,7 @@ const PostWidget = ({
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle={commentDate}
+        subtitle={postDate}
         userPicturePath={userPicturePath}
       />
 

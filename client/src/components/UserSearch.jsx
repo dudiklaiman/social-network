@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Box, useTheme, IconButton, InputBase, Paper } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Search, ClearOutlined } from "@mui/icons-material";
 
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import Friend from "src/components/Friend";
@@ -26,7 +26,7 @@ const UserSearch = ({ isMobile }) => {
 
     try {
       const data = (await api(token).get(`users/search?query=${text}`)).data;
-      setSearchResults(data.filter(user => user._id != loggedInUserId));
+      setSearchResults(data.filter(user => user._id != loggedInUserId));  // So the results will not include the user whos'e searching
     }
     catch (error) {
       console.error("Error searching users:", error);
@@ -45,13 +45,23 @@ const UserSearch = ({ isMobile }) => {
         gap="3rem"
         padding="0.1rem 0.5rem"
       >
-
         <InputBase
           sx={{ width: "100%" }}
           placeholder="Search users..."
           value={searchText}
           onChange={(e) => handleSearchChange(e.target.value)}
           startAdornment={<IconButton><Search /></IconButton>}
+          endAdornment={
+            searchText && 
+              <IconButton
+                onClick={() => {
+                  setSearchText("");
+                  setSearchResults([]);
+                }}
+              >
+                <ClearOutlined />
+              </IconButton>
+          }
         />
 
         <Paper sx={{ maxHeight: isMobile ? "14rem" : "8rem", marginBottom: (searchResults.length > 0) && "0.5rem", overflow: "auto", backgroundColor: neutralLight, boxShadow: "none", backgroundImage: "none" }}>

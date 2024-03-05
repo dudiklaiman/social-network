@@ -13,6 +13,7 @@ import {
   FormControl,
   useTheme,
   useMediaQuery,
+  Drawer
 } from "@mui/material";
 import {
   Message,
@@ -26,6 +27,7 @@ import {
 
 import FlexBetween from "./utilComponents/FlexBetween";
 import UserSearch from "src/components/UserSearch";
+// import ChatPage from "src/pages/ChatPage";
 
 
 const NavBar = () => {
@@ -35,6 +37,7 @@ const NavBar = () => {
 
   const user = useSelector((state) => state.user);
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const neutralLight = palette.neutral.light;
@@ -76,9 +79,15 @@ const NavBar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton> */}
-          <Message sx={{ fontSize: "25px" }} />
-          <Notifications sx={{ fontSize: "25px" }} />
-          <Help sx={{ fontSize: "25px" }} />
+          <IconButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+            <Message sx={{ fontSize: "25px", color: dark }} />
+          </IconButton>
+          {/*<Drawer anchor="right" open={isDrawerOpen} onClose={() => setIsDrawerOpen(!isDrawerOpen)}>
+            <ChatPage />
+          </Drawer>
+          */}
+          {/* <Notifications sx={{ fontSize: "25px" }} />
+          <Help sx={{ fontSize: "25px" }} /> */}
           <FormControl variant="standard" value={user.name}>
             <Select
               value={user.name}

@@ -124,17 +124,16 @@ const NewPostWidget = ({ picturePath }) => {
             <Divider sx={{ margin: "1.25rem 0" }} />
 
             <FlexBetween>
-                <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+                <FlexBetween
+                    gap="0.25rem"
+                    onClick={() => setIsImage(!isImage)}
+                    sx={{ "&:hover": { cursor: "pointer", color: medium } }}
+                >
                     <ImageOutlined sx={{ color: mediumMain }} />
-                    <Typography
-                        color={mediumMain}
-                        sx={{ "&:hover": { cursor: "pointer", color: medium } }}
-                    >
-                        Image
-                    </Typography>
+                    <Typography color={mediumMain}>Image</Typography>
                 </FlexBetween>
 
-                {isNonMobileScreens ? (
+                {/* {isNonMobileScreens ? (
                     <>
                         <FlexBetween gap="0.25rem">
                             <GifBoxOutlined sx={{ color: mediumMain }} />
@@ -152,10 +151,10 @@ const NewPostWidget = ({ picturePath }) => {
                         </FlexBetween>
                     </>
                 ) : (
-                    <FlexBetween gap="0.25rem">
-                        <MoreHorizOutlined sx={{ color: mediumMain }} />
-                    </FlexBetween>
-                )}
+                )} */}
+                <FlexBetween gap="0.25rem">
+                    <MoreHorizOutlined sx={{ color: mediumMain }} />
+                </FlexBetween>
 
                 <Button
                     disabled={!description}

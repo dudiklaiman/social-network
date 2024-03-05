@@ -7,7 +7,7 @@ import { ManageAccountsOutlined, LocationOnOutlined, WorkOutlineOutlined, Calend
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import FlexBetween from "src/components/utilComponents/FlexBetween";
 import UserImage from "src/components/utilComponents/UserImage";
-import { formatDataToMonthAndYear } from "src/utils/utils";
+import { formatDateToMonthAndYear } from "src/utils/utils";
 
 
 const UserWidget = ({ user }) => {
@@ -15,7 +15,7 @@ const UserWidget = ({ user }) => {
     const { palette } = useTheme();
 
     const loggedInUserId = useSelector((state) => state.user._id);
-    const formatedData = formatDataToMonthAndYear(new Date(user?.createdAt));
+    const formattedDate = formatDateToMonthAndYear(new Date(user?.createdAt));
 
     const dark = palette.neutral.dark;
     const medium = palette.neutral.medium;
@@ -75,7 +75,7 @@ const UserWidget = ({ user }) => {
                 </Box>
                 <Box display="flex" alignItems="center" gap="1rem" mt="0.5rem">
                     <CalendarTodayOutlined fontSize="large" sx={{ color: main }} />
-                    <Typography color={medium}>Joined: {formatedData}</Typography>
+                    <Typography color={medium}>Joined: {formattedDate}</Typography>
                 </Box>
             </Box>
 
