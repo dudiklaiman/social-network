@@ -4,6 +4,7 @@ import { setPosts } from "src/state/authSlice";
 
 import PostWidget from "src/widgets/PostWidget";
 import api from 'src/utils/apiRequests';
+import { Box, Typography } from "@mui/material";
 
 
 const FeedWidget = ({ user, isProfile }) => {
@@ -26,21 +27,35 @@ const FeedWidget = ({ user, isProfile }) => {
 
     return (
         <>
-            {posts.map((post) => (
-                <PostWidget
-                    key={post._id}
-                    postId={post._id}
-                    postUserId={post.user._id}
-                    name={`${post.user.name}`}
-                    description={post.description}
-                    location={post.user.location}
-                    picturePath={post.picturePath}
-                    userPicturePath={post.user.picturePath}
-                    likes={post.likes}
-                    comments={post.comments}
-                    createdAt={post.createdAt}
-                />
-            ))}
+            {posts.length > 0 ?
+                posts.map((post) => (
+                    <Box
+                        key={post._id}
+                        margin={isProfile ? "0 0 2rem 0" : "2rem 0"}
+                    >
+                        <PostWidget
+                            postId={post._id}
+                            postUserId={post.user._id}
+                            name={`${post.user.name}`}
+                            description={post.description}
+                            location={post.user.location}
+                            picturePath={post.picturePath}
+                            userPicturePath={post.user.picturePath}
+                            likes={post.likes}
+                            comments={post.comments}
+                            createdAt={post.createdAt}
+                        />
+                    </Box>
+                )) :
+                <Typography
+                    mt="5rem"
+                    textAlign="center"
+                    variant="h2"
+                    fontWeight="500"
+                >
+                    No posts
+                </Typography>
+            }
         </>
     );
 };

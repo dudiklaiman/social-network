@@ -33,6 +33,7 @@ function App() {
             <Route path='/login' element={<LoginPage />} />
             <Route path='/' element={isAuth ? <HomePage /> : <Navigate to='/login' />} />
             <Route path='/profile/:userId' element={isAuth ? <ProfilePage /> : <Navigate to='/login' />} />
+            {/* <Route path='/profile/:userId/edit' element={isAuth ? <EditProfilePage /> : <Navigate to='/login' />} /> */}
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

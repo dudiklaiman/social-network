@@ -50,7 +50,7 @@ const PostWidget = ({
   };
 
   return (
-    <WidgetWrapper my="2rem">
+    <WidgetWrapper>
 
       <Friend
         friendId={postUserId}

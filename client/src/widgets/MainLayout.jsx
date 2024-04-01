@@ -26,7 +26,7 @@ const MainLayout = ({ user, isProfile }) => {
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget user={user} />
           <Box m="2rem 0" />
-          {!isNonMobileScreens && isProfile && <FriendListWidget userId={user._id} />}
+          {!isNonMobileScreens && isProfile && <FriendListWidget friends={user.friends} />}
         </Box>
 
         <Box
@@ -39,7 +39,7 @@ const MainLayout = ({ user, isProfile }) => {
 
         {isNonMobileScreens && (
           <Box flexBasis="26%">
-            <FriendListWidget userId={user._id} />
+            <FriendListWidget friends={user.friends} />
           </Box>
         )}
         

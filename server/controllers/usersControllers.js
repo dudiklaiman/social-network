@@ -1,5 +1,13 @@
 import UserModel from '../models/userModel.js';
+import { encryptPassword } from '../services/passwordEncryption.js';
+import { deleteImage } from '../services/uploadImage.js';
 
+
+const configPopulateFriends = {
+    path: 'friends',
+    model: UserModel,
+    select: '-password'
+}
 
 export const getUser = async (req, res) => {
     try {
@@ -7,13 +15,7 @@ export const getUser = async (req, res) => {
         const user = await UserModel
         .findById(userId)
         .select("-password")
-        .populate(
-            {
-                path: 'friends',
-                model: UserModel,
-                select: '-password'
-            },
-        );
+        .populate(configPopulateFriends);
 
         res.status(200).json(user);
     }
@@ -22,16 +24,11 @@ export const getUser = async (req, res) => {
     }
 }
 
-
 export const searchUsers = async (req, res) => {
     try {
         const { query } = req.query;
         const users = await UserModel
-            .find({
-                $or: [
-                    { name: { $regex: query, $options: 'i' } }
-                ],
-            })
+            .find({ name: { $regex: query, $options: 'i' } })
             .select('name picturePath');
 
         // Sort the results based on name similarity to the query
@@ -48,26 +45,19 @@ export const searchUsers = async (req, res) => {
     }
 };
 
-
 export const getUserFriends = async (req, res) => {
     try {
         const { userId } = req.params;
         const { friends } = await UserModel
             .findById(userId)
-            .populate(
-                {
-                    path: 'friends',
-                    model: UserModel,
-                    select: '-password'
-                },
-            );
+            .populate(configPopulateFriends);
+
         res.json(friends);
     }
     catch (err) {
         res.status(404).json({ message: err.message });
     }
-}
-
+};
 
 export const addRemoveFriend = async (req, res) => {
     try {
@@ -89,17 +79,44 @@ export const addRemoveFriend = async (req, res) => {
 
         const { friends } = await UserModel
             .findById(userId)
-            .populate(
-                {
-                    path: 'friends',
-                    model: UserModel,
-                    select: '-password'
-                },
-            );
+            .populate(configPopulateFriends);
 
         res.status(200).json(friends);
     }
     catch (err) {
         res.status(404).json({ message: err.message });
     }
-}
+};
+
+export const editProfile = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (req.tokenData._id != userId) return res.status(403).json({ error: "cannot modify another user's info" });
+
+        if (req.body.password) req.body.password = await encryptPassword(req.body.password);
+
+        const updatedUser = await UserModel
+        .findByIdAndUpdate(userId, req.body, { new: true })
+
+        deleteImage();
+
+        res.status(200).json(updatedUser);
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+export const deleteProfile = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (req.tokenData._id != userId) return res.status(403).json({ error: "cannot delete another user's account" });
+    
+        const deletedUser = await UserModel.findByIdAndDelete(userId);
+    
+        res.status(200).json({ "deleted user": deletedUser });
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
