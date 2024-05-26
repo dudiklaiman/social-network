@@ -51,8 +51,8 @@ const FeedWidget = ({ user, isProfile }) => {
                         name={`${post.user.name}`}
                         description={post.description}
                         location={post.user.location}
-                        picturePath={post.picturePath}
-                        userPicturePath={post.user.picturePath}
+                        picture={post.picture}
+                        userPicture={post.user.picture}
                         likes={post.likes}
                         comments={post.comments}
                         createdAt={post.createdAt}

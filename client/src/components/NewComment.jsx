@@ -28,7 +28,7 @@ const NewComment = ({ postId }) => {
     return (
         <Box p="1rem 0rem 1rem 0.5rem">
             <FlexBetween gap="1.5rem">
-                <UserImage image={user.picturePath} size="40px" />
+                <UserImage image={user.picture.url} size="40px" />
                 <InputBase
                     placeholder="Leave a comment..."
                     onChange={(e) => setCommentBody(e.target.value)}

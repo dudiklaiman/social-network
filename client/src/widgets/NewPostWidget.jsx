@@ -30,11 +30,12 @@ import { compressImage } from "src/utils/utils";
 import api from "src/utils/apiRequests";
 
 
-const NewPostWidget = ({ picturePath }) => {
+const NewPostWidget = () => {
     const dispatch = useDispatch();
     const { palette } = useTheme();
 
     const token = useSelector((state) => state.token);
+    const pictureUrl = useSelector((state) => state.user.picture.url);
     const [description, setDescription] = useState("");
     const [isImage, setIsImage] = useState(false);
     const [image, setImage] = useState(null);
@@ -63,7 +64,7 @@ const NewPostWidget = ({ picturePath }) => {
     return (
         <WidgetWrapper>
             <FlexBetween gap="1.5rem">
-                <UserImage image={picturePath} />
+                <UserImage image={pictureUrl} />
                 <InputBase
                     placeholder="What's on your mind..."
                     onChange={(e) => setDescription(e.target.value)}

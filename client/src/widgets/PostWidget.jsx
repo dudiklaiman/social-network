@@ -23,8 +23,8 @@ const PostWidget = ({
   name,
   description,
   location,
-  picturePath,
-  userPicturePath,
+  picture,
+  userPicture,
   likes,
   comments,
   createdAt
@@ -79,20 +79,20 @@ const PostWidget = ({
         friendId={postUserId}
         name={name}
         subtitle={postDate}
-        userPicturePath={userPicturePath}
+        userPicturePath={userPicture.url}
       />
 
       <Typography color={main} sx={{ mt: "1rem" }}>
         {description}
       </Typography>
 
-      {picturePath && (
+      {picture && (
         <img
           width="100%"
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={picturePath}
+          src={picture.url}
         />
       )}
 
@@ -141,8 +141,9 @@ const PostWidget = ({
               commentId={comment._id}
               commentBody={comment.body}
               likes={comment.likes}
+              userId={comment.user._id}
               userName={`${comment.user.name}`}
-              userPicturePath={comment.user.picturePath}
+              userPicturePath={comment.user.picture.url}
               createdAt={comment.createdAt}
             />
           ))}

@@ -89,7 +89,6 @@ export const deleteComment = async (req, res) => {
         await CommentModel.findByIdAndDelete(commentId);
         await post.save();
 
-
         const updatedPost = await PostModel
         .findById(comment.post)
         .populate(configPopulate);
