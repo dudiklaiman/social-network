@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "src/state/authSlice";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -35,6 +35,7 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
   const [isComments, setIsComments] = useState(false);
+  const [sortedComments, setSortedComments] = useState(comments);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const postDate = formatTimePassed(createdAt);
@@ -48,6 +49,28 @@ const PostWidget = ({
     const updatedPost = (await api(token).patch(`posts/${postId}/like`)).data;
     dispatch(setPost({ post: updatedPost }));
   };
+
+  useEffect(() => {
+    const sortComments = () => {
+      if (isComments && comments) {
+        const sortedCommentsCopy = [...comments];
+        sortedCommentsCopy.sort((a, b) => {
+          const likesCountA = Object.keys(a.likes).length;
+          const likesCountB = Object.keys(b.likes).length;
+          const likesComparison = likesCountB - likesCountA;
+          if (likesComparison !== 0) {
+            return likesComparison;
+          }
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+        
+          return dateB - dateA;
+        });
+        setSortedComments(sortedCommentsCopy);
+      }
+    };
+    sortComments();
+  }, [comments, isComments]);
 
   return (
     <WidgetWrapper>
@@ -111,7 +134,7 @@ const PostWidget = ({
           <Divider />
           <NewComment postId={postId} />
           <Divider />
-          {comments.map((comment) => (
+          {sortedComments.map((comment) => (
             <Comment
               key={comment._id}
               postUserId={postUserId}

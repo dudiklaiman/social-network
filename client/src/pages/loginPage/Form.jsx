@@ -54,7 +54,6 @@ const Form = () => {
         else formData.append(value, values[value]);
       }
 
-      // const savedUser = await apiPost("auth/register", formData, {'Content-Type': 'multipart/form-data'});
       const savedUser = (await api("", {'Content-Type': 'multipart/form-data'}).post("auth/register", formData)).data;
       onSubmitProps.resetForm();
   
@@ -64,11 +63,10 @@ const Form = () => {
     };
   
     const login = async (values, onSubmitProps) => {
-      // const { user, token } = await apiPost("auth/login", values);
       const { user, token } = (await api().post("auth/login", values)).data;
 
-
       onSubmitProps.resetForm();
+      
       if (user && token) {
         dispatch(
           setLogin({ user, token })

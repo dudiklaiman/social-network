@@ -2,17 +2,8 @@ import UserModel from '../models/userModel.js';
 import { encryptPassword, comparePassword } from '../services/passwordEncryption.js';
 import { validateLogin, validateRegister } from '../services/userValidations.js';
 import { createToken } from '../services/createToken.js';
-// import { v2 as cloudinary } from 'cloudinary';
-import dotenv from 'dotenv';
 import { uploadImage } from '../services/uploadImage.js';
-dotenv.config();
 
-
-// cloudinary.config({ 
-//     cloud_name: process.env.CLOUD_NAME, 
-//     api_key: process.env.API_KEY, 
-//     api_secret: process.env.API_SECRET, 
-// });
 
 const configPopulateFriends = {
     path: 'friends',
@@ -29,16 +20,18 @@ export const register = async (req, res) => {
         const user = new UserModel(req.body);
 
         if (req.files) {
-            const uploadedImage = await uploadImage(req.files.picture)
-            user.picturePath = uploadedImage;
+            const uploadedImage = await uploadImage(req.files.picture, "users");
+            user.picture.url = uploadedImage.secure_url;
+            user.picture.identifier = uploadedImage.public_id;
+            user.picture.createdAt = uploadedImage.created_at;
         }
 
         user.password = await encryptPassword(user.password);
         user.email = user.email.toLowerCase();
-        await user.save();
-        user.password = '*'.repeat(req.body.password.length);
 
-        res.status(201).json(user);
+        await user.save();
+
+        res.status(201).json(user); // don't actually need to return user
     }
     catch (err) {
         if (err.code == 11000) return res.status(400).json({ error: "Email already in system", code:11000 });

@@ -2,16 +2,8 @@ import CommentModel from '../models/commentModel.js';
 import PostModel from '../models/postModel.js'
 import UserModel from '../models/userModel.js';
 import { validateCreatePost } from '../services/postValidation.js'
-import { v2 as cloudinary } from 'cloudinary';
-import dotenv from 'dotenv';
-dotenv.config();
+import { uploadImage } from '../services/uploadImage.js';
 
-
-cloudinary.config({ 
-    cloud_name: process.env.CLOUD_NAME, 
-    api_key: process.env.API_KEY, 
-    api_secret: process.env.API_SECRET, 
-});
 
 const configPopulate = [
     {
@@ -30,7 +22,6 @@ const configPopulate = [
     },
 ];
 
-
 export const createPost = async (req, res) => {
     const validBody = validateCreatePost(req.body)
     if (validBody.error) return res.status(400).json(validBody.error.details);
@@ -39,9 +30,9 @@ export const createPost = async (req, res) => {
         const post = new PostModel(req.body);
 
         if (req.files) {
-            const reqFile = req.files.picture;
-            const file = await cloudinary.uploader.upload(reqFile.tempFilePath, { unique_filename: true });
-            post.picturePath = file.secure_url;
+            const uploadedImage = await uploadImage(req.files.picture, "posts");
+            post.picture.url = uploadedImage.secure_url;
+            post.picture.identifier = uploadedImage.public_id;
         }
 
         post.user = req.tokenData._id;
@@ -60,7 +51,6 @@ export const createPost = async (req, res) => {
     }
 }
 
-
 export const getPostsFeed = async (req, res) => {
     try {
         const allPosts = await PostModel
@@ -74,7 +64,6 @@ export const getPostsFeed = async (req, res) => {
         res.status(404).json({ message: err.message });
     }
 }
-
 
 export const getUserPosts = async (req, res) => {
     try {
@@ -91,7 +80,6 @@ export const getUserPosts = async (req, res) => {
         res.status(404).json({ message: err.message });
     }
 };
-
 
 export const likePost = async (req, res) => {
     try {

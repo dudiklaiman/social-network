@@ -10,11 +10,12 @@ cloudinary.config({
 });
 
 
-export const uploadImage = async (image) => {
-    const uploadedImage = await cloudinary.uploader.upload(image.tempFilePath, { unique_filename: true });
-    return uploadedImage.secure_url;
+export const uploadImage = async (image, folder) => {
+    const uploadedImage = await cloudinary.uploader.upload(image.tempFilePath, { folder: folder, unique_filename: true });
+    return uploadedImage;
 }
 
-export const deleteImage = async () => {
-    // console.log(cloudinary.utils.publicId("https://res.cloudinary.com/dtk7xoyb4/image/upload/v1704813749/iy0tz6tjtskev2hpmwui.jpg"));
+export const deleteImage = async (imageIdentifier) => {
+    const deletedImage = await cloudinary.uploader.destroy(imageIdentifier);
+    console.log(deletedImage);
 };

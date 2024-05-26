@@ -5,7 +5,11 @@ const UserSchema = new mongoose.Schema({
     name: String,
     email: String,
     password: String,
-    picturePath: String,
+    picture: {
+        url: String,
+        identifier: String,
+        createdAt: { type: Date }
+    },
     friends: [{ type: mongoose.Schema.Types.ObjectId }],
     location: String,
     occupation: String,

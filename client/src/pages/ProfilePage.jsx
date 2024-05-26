@@ -18,7 +18,7 @@ const ProfilePage = () => {
       setUser(user);
     }
     getUser();
-  }, []);
+  }, [userId]);
 
   return user ? <MainLayout user={user} isProfile /> : null;
 };
