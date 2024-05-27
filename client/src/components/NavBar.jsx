@@ -79,15 +79,13 @@ const NavBar = () => {
               <LightMode sx={{ color: dark, fontSize: "25px" }} />
             )}
           </IconButton> */}
-          <IconButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+          {/* <IconButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
             <Message sx={{ fontSize: "25px", color: dark }} />
-          </IconButton>
-          {/*<Drawer anchor="right" open={isDrawerOpen} onClose={() => setIsDrawerOpen(!isDrawerOpen)}>
+          </IconButton> */}
+          {/* <Drawer anchor="right" open={isDrawerOpen} onClose={() => setIsDrawerOpen(!isDrawerOpen)}>
             <ChatPage />
           </Drawer>
           */}
-          {/* <Notifications sx={{ fontSize: "25px" }} />
-          <Help sx={{ fontSize: "25px" }} /> */}
           <FormControl variant="standard" value={user.name}>
             <Select
               value={user.name}
@@ -163,9 +161,7 @@ const NavBar = () => {
               )}
             </IconButton> */}
               <UserSearch isMobile />
-              <Message sx={{ fontSize: "25px" }} />
-              <Notifications sx={{ fontSize: "25px" }} />
-              <Help sx={{ fontSize: "25px" }} />
+              {/* <Message sx={{ fontSize: "25px" }} /> */}
               <FormControl variant="standard" value={user.name}>
                 <Select
                   value={user.name}

@@ -4,7 +4,7 @@ import { setPost } from "src/state/authSlice";
 import { useNavigate } from "react-router-dom";
 
 import { FavoriteBorderOutlined, FavoriteOutlined, DeleteOutline, MoreHoriz } from "@mui/icons-material";
-import { Box, Typography, useTheme, IconButton, Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+import { useMediaQuery, Box, Typography, useTheme, IconButton, Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import FlexBetween from "src/components/utilComponents/FlexBetween";
@@ -29,24 +29,25 @@ const Comment = ({
 
     const loggedInUserId = useSelector((state) => state.user._id);
     const token = useSelector((state) => state.token);
-    const commentDate = formatTimePassed(createdAt);
     const isLiked = Boolean(likes[loggedInUserId]);
     const likeCount = Object.keys(likes).length;
-
+    
     // const [anchorEl, setAnchorEl] = useState(null);
-
+    
     // const handleClick = (event) => {
-    //     setAnchorEl(event.currentTarget);
+        //     setAnchorEl(event.currentTarget);
+        // };
+        // const handleClose = () => {
+        //     setAnchorEl(null);
     // };
-    // const handleClose = () => {
-    //     setAnchorEl(null);
-    // };
-
+            
+    const isMobileScreen = useMediaQuery("(max-width: 1000px)");
     const primary = palette.primary.main;
     const main = palette.neutral.main;
     const medium = palette.neutral.medium;
-
-
+            
+            
+    const commentDate = formatTimePassed(createdAt, isMobileScreen);
     const [open, setOpen] = useState(false);
 
     const handleDelete = async () => {

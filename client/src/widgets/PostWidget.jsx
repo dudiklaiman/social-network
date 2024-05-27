@@ -36,6 +36,7 @@ const PostWidget = ({
   const loggedInUserId = useSelector((state) => state.user._id);
   const [isComments, setIsComments] = useState(false);
   const [sortedComments, setSortedComments] = useState(comments);
+  const isLoggedInUsersPost = loggedInUserId == postUserId;
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const postDate = formatTimePassed(createdAt);

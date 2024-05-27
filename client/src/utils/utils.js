@@ -1,5 +1,10 @@
 import imageCompression from 'browser-image-compression';
 import { formatDistanceToNow } from "date-fns";
+import moment from 'moment';
+// import 'moment-duration-format';
+// import '../../node_modules/moment-duration-format'
+import momentDurationFormatSetup from 'moment-duration-format';
+
 
 
 export const compressImage = async (image) => {
@@ -20,8 +25,42 @@ export const compressImage = async (image) => {
 }
 
 
-export const formatTimePassed = (date) => {
-    return formatDistanceToNow(date, { addSuffix: true }).replace("about", "").replace("less than a minute ago", "right now");
+export const formatTimePassed = (date, isSmallScreen=false) => {
+    let result = formatDistanceToNow(date, { addSuffix: true }).replace("about", "").replace("less than a minute ago", "Right now");
+
+    if (isSmallScreen) {
+        if (result === "Right now") return result.replace("Right now", "Now");
+        
+        const units = {
+            minutes: 'm',
+            hours: 'h',
+            days: 'd',
+            weeks: 'w',
+            months: 'M',
+            years: 'y'
+        }
+
+        const unitsSingular = {
+            minute: 'm',
+            hour: 'h',
+            day: 'd',
+            week: 'w',
+            month: 'M',
+            year: 'y'
+        }
+
+        for (const [key, value] of Object.entries(units)) {
+            result = result.replace(` ${key} ago`, value);
+        }
+
+        for (const [key, value] of Object.entries(unitsSingular)) {
+            result = result.replace(` ${key} ago`, value);
+        }
+
+        result = result.replace("ago", "");
+    }
+
+    return result;
 }
 
 
