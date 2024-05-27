@@ -1,10 +1,5 @@
 import imageCompression from 'browser-image-compression';
 import { formatDistanceToNow } from "date-fns";
-import moment from 'moment';
-// import 'moment-duration-format';
-// import '../../node_modules/moment-duration-format'
-import momentDurationFormatSetup from 'moment-duration-format';
-
 
 
 export const compressImage = async (image) => {
@@ -30,7 +25,7 @@ export const formatTimePassed = (date, isSmallScreen=false) => {
 
     if (isSmallScreen) {
         if (result === "Right now") return result.replace("Right now", "Now");
-        
+
         const units = {
             minutes: 'm',
             hours: 'h',
