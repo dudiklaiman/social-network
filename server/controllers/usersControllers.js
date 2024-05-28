@@ -1,6 +1,6 @@
 import UserModel from '../models/userModel.js';
-import { encryptPassword } from '../services/passwordEncryption.js';
-import { deleteImage } from '../services/uploadImage.js';
+import { encryptPassword } from '../utils/passwordEncryption.js';
+import { deleteImage } from '../utils/uploadImage.js';
 
 
 const configPopulateFriends = {
@@ -29,7 +29,7 @@ export const searchUsers = async (req, res) => {
         const { query } = req.query;
         const users = await UserModel
             .find({ name: { $regex: query, $options: 'i' } })
-            .select('name picturePath');
+            .select('name picture');
 
         // Sort the results based on name similarity to the query
         users.sort((a, b) => {
@@ -110,7 +110,7 @@ export const editProfile = async (req, res) => {
 export const deleteProfile = async (req, res) => {
     try {
         const { userId } = req.params;
-        if (req.tokenData._id != userId) return res.status(403).json({ error: "cannot delete another user's account" });
+        if (!req.tokenData._id.equals(userId)) return res.status(403).json({ error: "cannot delete another user's account" });
     
         const deletedUser = await UserModel.findByIdAndDelete(userId);
     

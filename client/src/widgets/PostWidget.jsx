@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "src/state/authSlice";
+import { setPost, deletePost } from "src/state/authSlice";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, FavoriteOutlined, ShareOutlined } from "@mui/icons-material";
-import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Divider, IconButton, Typography, useTheme, Menu, MenuItem, Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, FavoriteOutlined, MoreHoriz, } from "@mui/icons-material";
 
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import FlexBetween from "src/components/utilComponents/FlexBetween";
@@ -34,26 +34,33 @@ const PostWidget = ({
 
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
-  const [isComments, setIsComments] = useState(false);
+  const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
   const [sortedComments, setSortedComments] = useState(comments);
-  const isLoggedInUsersPost = loggedInUserId == postUserId;
-  const isLiked = Boolean(likes[loggedInUserId]);
-  const likeCount = Object.keys(likes).length;
-  const postDate = formatTimePassed(createdAt);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isDeletePostDialogOpen, setIsDeletePostDialogOpen] = useState(false);
+  const isPostLiked = Boolean(likes[loggedInUserId]);
+  const postLikeCount = Object.keys(likes).length;
+  const postCreationDate = formatTimePassed(createdAt);
 
   const mode = useSelector((state) => state.mode);
   const main = palette.neutral.main;
   const primary = palette.primary.main;
 
 
-  const handleLike = async () => {
-    const updatedPost = (await api(token).patch(`posts/${postId}/like`)).data;
+  const handlePostLike = async () => {
+    const updatedPost = (await api(token).patch(`posts/like/${postId}`)).data;
     dispatch(setPost({ post: updatedPost }));
+  };
+
+  const handleDeletePost = async () => {
+    await api(token).delete(`posts/delete/${postId}`);
+    dispatch(deletePost({ postId: postId }));
+    setAnchorEl(null);
   };
 
   useEffect(() => {
     const sortComments = () => {
-      if (isComments && comments) {
+      if (isCommentSectionOpen && comments) {
         const sortedCommentsCopy = [...comments];
         sortedCommentsCopy.sort((a, b) => {
           const likesCountA = Object.keys(a.likes).length;
@@ -64,14 +71,14 @@ const PostWidget = ({
           }
           const dateA = new Date(a.createdAt);
           const dateB = new Date(b.createdAt);
-        
+
           return dateB - dateA;
         });
         setSortedComments(sortedCommentsCopy);
       }
     };
     sortComments();
-  }, [comments, isComments]);
+  }, [comments, isCommentSectionOpen]);
 
   return (
     <WidgetWrapper>
@@ -79,8 +86,8 @@ const PostWidget = ({
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle={postDate}
-        userPicturePath={userPicture.url}
+        subtitle={postCreationDate}
+        userPicturePath={userPicture?.url}
       />
 
       <Typography color={main} sx={{ mt: "1rem" }}>
@@ -102,35 +109,96 @@ const PostWidget = ({
 
           {/* Like button */}
           <FlexBetween gap="0.3rem">
-            <IconButton onClick={handleLike} >
-              {isLiked ? (
+            <IconButton onClick={handlePostLike} >
+              {isPostLiked ? (
                 <FavoriteOutlined sx={{ color: primary }} />
               ) : (
                 <FavoriteBorderOutlined />
               )}
             </IconButton>
-            <Typography>{likeCount}</Typography>
+            <Typography>{postLikeCount}</Typography>
           </FlexBetween>
 
           {/* Comment button */}
           <FlexBetween gap="0.3rem">
-            <IconButton onClick={() => setIsComments(!isComments)}>
+            <IconButton onClick={() => setIsCommentSectionOpen(!isCommentSectionOpen)}>
               <ChatBubbleOutlineOutlined />
             </IconButton>
             <Typography>{comments.length}</Typography>
           </FlexBetween>
         </FlexBetween>
 
-        {/* Share button */}
-        <IconButton>
-          <CopyToClipboard text={`${window.location.href}`} onCopy={() => toast("Coppied to clipboard")} >
-            <ShareOutlined />
-          </CopyToClipboard>
+        {/* Options button */}
+        <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
+          <MoreHoriz />
         </IconButton>
+
+        <Menu
+          id="long-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          {/* Share button */}
+          <MenuItem
+            onClick={() => setAnchorEl(null)}
+            sx={{ justifyContent: 'center', padding: "0.2rem 1rem" }}
+          >
+            <CopyToClipboard text={`${window.location.href}`} onCopy={() => toast("Coppied to clipboard")}>
+              <Typography
+                color={main}
+                variant="h5"
+                fontWeight="500"
+              >
+                Share
+              </Typography>
+            </CopyToClipboard>
+          </MenuItem>
+
+          {loggedInUserId == postUserId && [
+            <Divider key="divider" />,
+
+            // Delete button
+            <MenuItem
+              key="delete"
+              onClick={() => setIsDeletePostDialogOpen(!isDeletePostDialogOpen)}
+              sx={{ justifyContent: 'center', padding: "0.2rem 1rem" }}
+            >
+              <Typography
+                color="error"
+                variant="h5"
+                fontWeight="500"
+              >
+                Delete
+              </Typography>
+              <Dialog
+                open={isDeletePostDialogOpen}
+                onClose={() => setIsDeletePostDialogOpen(false)}
+              >
+                <DialogTitle>
+                  <Typography fontWeight="500">
+                    Are you sure you want to delete this post?
+                  </Typography>
+                </DialogTitle>
+
+                <DialogActions>
+                  <Button onClick={() => setIsDeletePostDialogOpen(false)} sx={{ color: 'grey' }}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleDeletePost} color="error" autoFocus>
+                    Yes
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </MenuItem>
+          ]}
+        </Menu>
+
       </FlexBetween>
 
       {/* Comment section */}
-      {isComments && (
+      {isCommentSectionOpen && (
         <Box mt="0.5rem">
           <Divider />
           <NewComment postId={postId} />
@@ -144,7 +212,7 @@ const PostWidget = ({
               likes={comment.likes}
               userId={comment.user._id}
               userName={`${comment.user.name}`}
-              userPicturePath={comment.user.picture.url}
+              userPicturePath={comment.user.picture?.url}
               createdAt={comment.createdAt}
             />
           ))}
@@ -164,7 +232,7 @@ const PostWidget = ({
         pauseOnHover={false}
         theme={mode}
       />
-      
+
     </WidgetWrapper>
   );
 };

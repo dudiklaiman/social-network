@@ -47,8 +47,12 @@ export const authSlice = createSlice({
             });
             state.posts = updatedPosts;
         },
+        deletePost: (state, action) => {
+            state.posts = state.posts.filter((post) => post._id !== action.payload.postId);
+
+        },
     },
 });
 
-export const { setMode, switchMode, setLogin, setLogout, setFriends, setPosts, setPost } = authSlice.actions;
+export const { setMode, switchMode, setLogin, setLogout, setFriends, setPosts, setPost, deletePost } = authSlice.actions;
 export default authSlice.reducer;

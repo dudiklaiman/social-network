@@ -1,8 +1,8 @@
 import UserModel from '../models/userModel.js';
-import { encryptPassword, comparePassword } from '../services/passwordEncryption.js';
-import { validateLogin, validateRegister } from '../services/userValidations.js';
-import { createToken } from '../services/createToken.js';
-import { uploadImage } from '../services/uploadImage.js';
+import { encryptPassword, comparePassword } from '../utils/passwordEncryption.js';
+import { validateLogin, validateRegister } from '../utils/userValidations.js';
+import { createToken } from '../utils/createToken.js';
+import { uploadImage } from '../utils/uploadImage.js';
 
 
 const configPopulateFriends = {

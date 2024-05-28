@@ -33,7 +33,7 @@ const MainLayout = ({ user, isProfile }) => {
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={!isNonMobileScreens && "2rem"}
         >
-          {!isProfile && <NewPostWidget picturePath={user.picturePath} />}
+          {!isProfile && <NewPostWidget picturePath={user.picture?.url} />}
           <FeedWidget user={user} isProfile={isProfile} />
         </Box>
 

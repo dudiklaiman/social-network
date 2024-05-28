@@ -70,7 +70,7 @@ const UserSearch = ({ isMobile }) => {
               <Friend
                 friendId={user._id}
                 name={`${user.name}`}
-                userPicturePath={user.picturePath}
+                userPicturePath={user.picture?.url}
                 userPicturePathSize="35px"
               />
             </Box>

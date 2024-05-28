@@ -1,8 +1,8 @@
 import CommentModel from '../models/commentModel.js';
 import PostModel from '../models/postModel.js'
 import UserModel from '../models/userModel.js';
-import { validateCreatePost } from '../services/postValidation.js'
-import { uploadImage } from '../services/uploadImage.js';
+import { validateCreatePost } from '../utils/postValidation.js'
+import { uploadImage, deleteImage } from '../utils/uploadImage.js';
 
 
 const configPopulate = [
@@ -83,10 +83,10 @@ export const getUserPosts = async (req, res) => {
 
 export const likePost = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { postId } = req.params;
         const userId = req.tokenData._id;
 
-        const post = await PostModel.findById(id);
+        const post = await PostModel.findById(postId);
         if (!post) return res.status(404).json({ err: "post not found" });
 
         const isLiked = post.likes.get(userId);
@@ -95,12 +95,33 @@ export const likePost = async (req, res) => {
         await post.save();
 
         const updatedPost = await PostModel
-            .findById(id)
+            .findById(postId)
             .populate(configPopulate);
 
         res.status(200).json(updatedPost);
     }
     catch (err) {
         res.status(404).json({ message: err.message });
+    }
+};
+
+export const deletePost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        
+        const post = await PostModel.findById(postId);
+        if (!post) return res.status(404).json({ err: "post not found" });
+        if (!req.tokenData._id.equals(post.user)) return res.status(403).json({ error: "cannot delete another user's post" });
+
+        await CommentModel.deleteMany({ post: postId });
+        if (post.picture.identifier) {
+            await deleteImage(post.picture.identifier);
+        }
+        await PostModel.findByIdAndDelete(postId);
+
+        res.status(200).json({ msg: "Post deleted successfully"});
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };

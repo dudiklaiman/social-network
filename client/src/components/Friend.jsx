@@ -15,9 +15,10 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
   const navigate = useNavigate();
   const { palette } = useTheme();
 
-  const { _id, friends } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const isFriend = friends.find((friend) => friend._id === friendId);
+  const loggedInUserId = useSelector((state) => state.user._id);
+  const friends = useSelector((state) => state.user.friends);
+  const isFriend = friends.find((friend) => friend.loggedInUserId === friendId);
 
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -26,7 +27,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
 
 
   const handleAddRemoveFriend = async () => {
-    const updatedFriends = (await api(token).patch(`users/${_id}/${friendId}`)).data;
+    const updatedFriends = (await api(token).patch(`users/${loggedInUserId}/${friendId}`)).data;
     dispatch(setFriends({ friends: updatedFriends }));
   };
 
@@ -55,7 +56,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
           </Typography>
         </Box>
       </FlexBetween>
-      {_id != friendId && (
+      {loggedInUserId != friendId && (
         <IconButton
           onClick={() => handleAddRemoveFriend()}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
