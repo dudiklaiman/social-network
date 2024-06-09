@@ -16,10 +16,15 @@ const UserWidget = ({ user }) => {
 
     const loggedInUserId = useSelector((state) => state.user._id);
     const formattedDate = formatDateToMonthAndYear(new Date(user?.createdAt));
+    const isOnUserPage = location.href.endsWith(user._id);
 
     const dark = palette.neutral.dark;
     const medium = palette.neutral.medium;
     const main = palette.neutral.main;
+
+    const navigateToUserPage = () => {
+        if (!isOnUserPage) navigate(`/profile/${user._id}`)
+    }
 
     return (
         <WidgetWrapper>
@@ -29,18 +34,25 @@ const UserWidget = ({ user }) => {
                 gap="0.5rem"
                 pb="1.1rem"
             >
-                <FlexBetween gap="1rem" onClick={() => navigate(`/profile/${user._id}`)}>
-                    <UserImage image={user.picture?.url} />
+                <FlexBetween gap="1rem">
+                    <UserImage
+                        image={user.picture?.url}
+                        onClick={navigateToUserPage}
+                        isClick={!isOnUserPage}
+                    />
                     <Box>
                         <Typography
+                            onClick={navigateToUserPage}
                             variant="h4"
                             color={dark}
                             fontWeight="500"
                             sx={{
-                                "&:hover": {
-                                    color: palette.primary.dark,
-                                    cursor: "pointer",
-                                },
+                                ...(!isOnUserPage && {
+                                    "&:hover": {
+                                        color: palette.primary.dark,
+                                        cursor: "pointer",
+                                    },
+                                })
                             }}
                         >
                             {user.name}

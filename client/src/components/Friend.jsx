@@ -18,7 +18,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
   const friends = useSelector((state) => state.user.friends);
-  const isFriend = friends.find((friend) => friend.loggedInUserId === friendId);
+  const isFriend = friends.find((friend) => friend._id === friendId);
 
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -35,18 +35,19 @@ const Friend = ({ friendId, name, subtitle, userPicturePath, userPicturePathSize
     <FlexBetween>
       <FlexBetween gap="1rem">
         <UserImage image={userPicturePath} size={userPicturePathSize} />
-        <Box
-          onClick={() => navigate(`/profile/${friendId}`)}
-        >
+        <Box>
           <Typography
+            onClick={() => { if (!location.href.endsWith(friendId)) navigate(`/profile/${friendId}`) }}
             color={main}
             variant="h5"
             fontWeight="500"
             sx={{
-              "&:hover": {
-                color: palette.primary.dark,
-                cursor: "pointer",
-              },
+              ...(!location.href.endsWith(friendId) && {
+                "&:hover": {
+                  color: palette.primary.dark,
+                  cursor: "pointer",
+                },
+              })
             }}
           >
             {name}

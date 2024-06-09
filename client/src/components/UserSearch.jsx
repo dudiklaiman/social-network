@@ -34,7 +34,7 @@ const UserSearch = ({ isMobile }) => {
   };
 
   return (
-    <WidgetWrapper padding={isMobile && "0rem"} >
+    <WidgetWrapper padding={isMobile && "0rem"}>
       <Box
         width={isMobile ? "15rem" : "20rem"}
         position={!isMobile && "absolute"}

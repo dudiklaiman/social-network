@@ -105,7 +105,14 @@ const NavBar = () => {
               input={<InputBase />}
             >
               <MenuItem value={user.name}>
-                <Typography>{user.name}</Typography>
+                <Typography
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                {user.name}</Typography>
               </MenuItem>
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>

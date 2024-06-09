@@ -31,6 +31,7 @@ const Comment = ({
     const token = useSelector((state) => state.token);
     const isCommentLiked = Boolean(likes[loggedInUserId]);
     const commentLikeCount = Object.keys(likes).length;
+    const isOnUserPage = location.href.endsWith(userId);
     
     const isMobileScreen = useMediaQuery("(max-width: 1000px)");
     const primary = palette.primary.main;
@@ -52,25 +53,35 @@ const Comment = ({
         setIsDeleteCommentDialogOpen(false);
     };
 
+    const navigateToUserPage = () => {
+        if (!isOnUserPage) navigate(`/profile/${userId}`)
+    }
+
 
     return (
         <WidgetWrapper padding="1.5rem 0rem 0.75rem 0.5rem">
             <FlexBetween sx={{ alignItems: "flex-start" }} >
                 <FlexBetween gap="1.5rem" sx={{ alignItems: "flex-start" }}>
-                    <UserImage image={userPicturePath} size="40px" sx={{ "&:hover": { cursor: "pointer" } }} onClick={() => navigate(`/profile/${postUserId}`)} />
+                    <UserImage image={userPicturePath} size="40px" onClick={navigateToUserPage} isClick={!isOnUserPage} />
 
                     <Box>
                         <FlexBetween gap="0.7rem" sx={{ justifyContent: "left" }}>
                             <Typography
-                                onClick={() => navigate(`/profile/${postUserId}`)}
+                                onClick={navigateToUserPage}
                                 variant="h5"
                                 fontSize="0.8rem"
                                 fontWeight="500"
+                                maxWidth="6.5rem"
                                 sx={{
-                                    "&:hover": {
-                                        color: palette.primary.dark,
-                                        cursor: "pointer",
-                                    },
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    ...(!isOnUserPage && {
+                                        "&:hover": {
+                                            color: palette.primary.dark,
+                                            cursor: "pointer",
+                                        },
+                                    })
                                 }}
                             >   {userName}
                             </Typography>
@@ -122,7 +133,9 @@ const Comment = ({
                         >
                             {commentBody}
                         </Typography>
+                        
                     </Box>
+                    
                 </FlexBetween>
 
                 <FlexBetween gap="0.3rem" >

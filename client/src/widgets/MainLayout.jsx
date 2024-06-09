@@ -1,6 +1,7 @@
 import { Box, useMediaQuery } from '@mui/material'
 
 import NavBar from 'src/components/NavBar'
+// import NavBar2 from 'src/components/NavBar2'
 import UserWidget from 'src/widgets/UserWidget';
 import NewPostWidget from 'src/widgets/NewPostWidget';
 import FriendListWidget from 'src/widgets/FriendListWidget';
