@@ -35,43 +35,65 @@ const initialValuesLogin = {
 
 
 const Form = () => {
-    const [pageType, setPageType] = useState("login");
     const { palette } = useTheme();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const isNonMobile = useMediaQuery("(min-width:600px)");
+
+    const [pageType, setPageType] = useState("login");
+    const [errorMessage, setErrorMessage] = useState("");
     const isLogin = pageType === "login";
     const isRegister = pageType === "register";
+
+    const isNonMobile = useMediaQuery("(min-width:600px)");
   
     
     const register = async (values, onSubmitProps) => {
-      const formData = new FormData();
-      for (let value in values) {
-        if (value == "picture") {
-          const compressedImage = await compressImage(values[value]);
-          formData.append("picture", compressedImage);
-        }
-        else formData.append(value, values[value]);
-      }
+      try {
+        const formData = new FormData();
 
-      const savedUser = (await api("", {'Content-Type': 'multipart/form-data'}).post("auth/register", formData)).data;
-      onSubmitProps.resetForm();
-  
-      if (savedUser) {
-        setPageType("login");
+        for (let value in values) {
+          if (value == "picture") {
+            const compressedImage = await compressImage(values[value]);
+            formData.append("picture", compressedImage);
+          }
+          else formData.append(value, values[value]);
+        }
+        
+        const savedUser = (await api("", {'Content-Type': 'multipart/form-data'}).post("auth/register", formData)).data;
+        onSubmitProps.resetForm();
+        setErrorMessage("");
+    
+        if (savedUser) {
+          setPageType("login");
+        }
+      }
+      catch (error) {
+        setErrorMessage("An unexpected error occurred.");
       }
     };
   
     const login = async (values, onSubmitProps) => {
-      const { user, token } = (await api().post("auth/login", values)).data;
+      try {
+        const response = (await api().post("auth/login", values)).data;
+        const { user, token } = response;
 
-      onSubmitProps.resetForm();
-      
-      if (user && token) {
-        dispatch(
-          setLogin({ user, token })
-        );
-        navigate("/");
+        onSubmitProps.resetForm();
+        setErrorMessage("");
+        
+        if (user && token) {
+          dispatch(
+            setLogin({ user, token })
+          );
+          navigate("/");
+        }
+      }
+      catch (error) {
+        if (error.response && error.response.status == 401) {
+          setErrorMessage("Wrong email or password");
+        }
+        else {
+          setErrorMessage("An unexpected error occurred");
+        }
       }
     };
   
@@ -197,6 +219,13 @@ const Form = () => {
                 </>
               )}
             </Box>
+
+            {/* Display error message */}
+            {errorMessage && (
+              <Typography color="error" sx={{ mt: 2 }}>
+                {errorMessage}
+              </Typography>
+            )}
   
             {/* BUTTONS */}
             <Box>
@@ -216,6 +245,7 @@ const Form = () => {
               <Typography
                 onClick={() => {
                   setPageType(isLogin ? "register" : "login");
+                  setErrorMessage("");
                   resetForm();
                 }}
                 sx={{

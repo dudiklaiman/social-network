@@ -4,15 +4,6 @@ import { setPosts } from "src/state/authSlice";
 import Dropzone from "react-dropzone";
 
 import {
-    EditOutlined,
-    DeleteOutlined,
-    AttachFileOutlined,
-    GifBoxOutlined,
-    ImageOutlined,
-    MicOutlined,
-    MoreHorizOutlined,
-} from "@mui/icons-material";
-import {
     Box,
     Divider,
     Typography,
@@ -21,7 +12,17 @@ import {
     Button,
     IconButton,
     useMediaQuery,
+    Dialog,
+    DialogTitle,
+    DialogActions
 } from "@mui/material";
+
+import {
+    EditOutlined,
+    DeleteOutlined,
+    ImageOutlined,
+    MoreHorizOutlined,
+} from "@mui/icons-material";
 
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import FlexBetween from "src/components/utilComponents/FlexBetween";
@@ -37,8 +38,11 @@ const NewPostWidget = () => {
     const token = useSelector((state) => state.token);
     const pictureUrl = useSelector((state) => state.user.picture.url);
     const [description, setDescription] = useState("");
-    const [isImage, setIsImage] = useState(false);
     const [image, setImage] = useState(null);
+    const [isImageDropZoneOpen, setIsImageDropZoneOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
     const mediumMain = palette.neutral.mediumMain;
@@ -46,19 +50,39 @@ const NewPostWidget = () => {
 
 
     const handlePost = async () => {
-        const formData = new FormData();
-        formData.append("description", description);
-        if (image) {
-            const compressedImage = await compressImage(image);
-            formData.append("picture", compressedImage);
+        setIsUploading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append("description", description);
+
+            if (image) {
+                try {
+                    const compressedImage = await compressImage(image);
+                    formData.append("picture", compressedImage);
+                }
+                catch (error) {
+                    setIsUploading(false);
+                    setErrorMessage(error.message);
+                    setIsErrorDialogOpen(true);
+                    return;
+                }
+            }
+
+            const allPosts = (await api(token, { 'Content-Type': 'multipart/form-data' }).post("posts", formData)).data;
+
+            dispatch(setPosts({ posts: allPosts }));
+            setDescription("");
+            setImage(null);
+            setIsImageDropZoneOpen(false);
+            setErrorMessage("");
+            setIsUploading(false);
         }
-
-        const allPosts = (await api(token, { 'Content-Type': 'multipart/form-data' }).post("posts", formData)).data;
-
-        dispatch(setPosts({ posts: allPosts }));
-        setDescription("");
-        setImage(null);
-        setIsImage(false);
+        catch (error) {
+            setIsUploading(false);
+            setErrorMessage("An unexpected error occurred.");
+            setIsErrorDialogOpen(true);
+        }
     };
 
     return (
@@ -77,7 +101,7 @@ const NewPostWidget = () => {
                     }}
                 />
             </FlexBetween>
-            {isImage && (
+            {isImageDropZoneOpen && (
                 <Box
                     border={`1px solid ${medium}`}
                     borderRadius="5px"
@@ -90,75 +114,89 @@ const NewPostWidget = () => {
                         onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
                     >
                         {({ getRootProps, getInputProps }) => (
-                            <FlexBetween>
-                                <Box
-                                    {...getRootProps()}
-                                    border={`2px dashed ${palette.primary.main}`}
-                                    p="1rem"
-                                    width="100%"
-                                    sx={{ "&:hover": { cursor: "pointer" } }}
-                                >
-                                    <input {...getInputProps()} />
-                                    {!image ? (
-                                        <p>Add Image Here</p>
-                                    ) : (
-                                        <FlexBetween>
-                                            <Typography>{image.name}</Typography>
-                                            <EditOutlined />
-                                        </FlexBetween>
-                                    )}
-                                </Box>
-                                {image && (
-                                    <IconButton
-                                        onClick={() => setImage(null)}
-                                        sx={{ width: "15%" }}
+                            <Box
+                                border={`2px dashed ${palette.primary.main}`}
+                                p="1rem"
+                            >
+                                <FlexBetween>
+                                    <Box
+                                        {...getRootProps()}
+                                        width="90%"
+                                        sx={{ "&:hover": { cursor: "pointer" } }}
                                     >
-                                        <DeleteOutlined />
-                                    </IconButton>
-                                )}
-                            </FlexBetween>
+                                        <input {...getInputProps()} />
+                                        {!image ? (
+                                            <p>Add Image Here</p>
+                                        ) : (
+                                            <FlexBetween>
+                                                <Typography
+                                                    pr="0.8rem"
+                                                    sx={{
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    {image.name}
+                                                </Typography>
+                                                <EditOutlined />
+                                            </FlexBetween>
+                                        )}
+                                    </Box>
+
+                                    {image && (
+                                        <IconButton
+                                            onClick={() => setImage(null)}
+                                            sx={{ padding: 0, paddingLeft: 1 }}
+                                        >
+                                            <DeleteOutlined />
+                                        </IconButton>
+                                    )}
+                                    
+                                </FlexBetween>
+
+                            </Box>
                         )}
                     </Dropzone>
                 </Box>
             )}
+
+            {/* Error dialog */}
+            <Dialog
+                open={isErrorDialogOpen}
+                onClose={() => setIsErrorDialogOpen(false)}
+            >
+                <DialogTitle>
+                    <Typography fontWeight="500">
+                        {errorMessage}
+                    </Typography>
+                </DialogTitle>
+
+                <DialogActions>
+                    <Button onClick={() => setIsErrorDialogOpen(false)} sx={{ color: 'grey' }}>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Divider sx={{ margin: "1.25rem 0" }} />
 
             <FlexBetween>
                 <FlexBetween
                     gap="0.25rem"
-                    onClick={() => setIsImage(!isImage)}
+                    onClick={() => setIsImageDropZoneOpen(!isImageDropZoneOpen)}
                     sx={{ "&:hover": { cursor: "pointer", color: medium } }}
                 >
                     <ImageOutlined sx={{ color: mediumMain }} />
                     <Typography color={mediumMain}>Image</Typography>
                 </FlexBetween>
 
-                {/* {isNonMobileScreens ? (
-                    <>
-                        <FlexBetween gap="0.25rem">
-                            <GifBoxOutlined sx={{ color: mediumMain }} />
-                            <Typography color={mediumMain}>Clip</Typography>
-                        </FlexBetween>
-
-                        <FlexBetween gap="0.25rem">
-                            <AttachFileOutlined sx={{ color: mediumMain }} />
-                            <Typography color={mediumMain}>Attachment</Typography>
-                        </FlexBetween>
-
-                        <FlexBetween gap="0.25rem">
-                            <MicOutlined sx={{ color: mediumMain }} />
-                            <Typography color={mediumMain}>Audio</Typography>
-                        </FlexBetween>
-                    </>
-                ) : (
-                )} */}
                 <FlexBetween gap="0.25rem">
                     <MoreHorizOutlined sx={{ color: mediumMain }} />
                 </FlexBetween>
 
                 <Button
-                    disabled={!description}
+                    disabled={(!description.trim() && !image) || isUploading}
                     onClick={handlePost}
                     sx={{
                         color: palette.background.alt,
@@ -172,6 +210,7 @@ const NewPostWidget = () => {
                     POST
                 </Button>
             </FlexBetween>
+
         </WidgetWrapper>
     );
 };

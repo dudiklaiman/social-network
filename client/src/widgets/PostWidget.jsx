@@ -172,6 +172,7 @@ const PostWidget = ({
               >
                 Delete
               </Typography>
+              
               <Dialog
                 open={isDeletePostDialogOpen}
                 onClose={() => setIsDeletePostDialogOpen(false)}

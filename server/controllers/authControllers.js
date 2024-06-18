@@ -46,10 +46,10 @@ export const login = async (req, res) => {
 
     try {
         const user = await UserModel.findOne({ email: req.body.email.toLowerCase() });
-        if (!user) return res.status(400).json({ msg: "User does not exist" });
+        if (!user) return res.status(401).json({ msg: "User does not exist" });
 
         const isMatching = await comparePassword(req.body.password, user.password);
-        if (!isMatching) return res.status(400).json({ msg: "Invalid credentials." });
+        if (!isMatching) return res.status(401).json({ msg: "Invalid credentials." });
 
         const userToReturn = await UserModel
             .findById(user._id)

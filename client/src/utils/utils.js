@@ -11,11 +11,11 @@ export const compressImage = async (image) => {
 
     try {
         const compressedImage = await imageCompression(image, options);
-        if (compressedImage.size > 10000000) return console.log(`image too large: (${compressedImage.size / 1024 / 1024} MB)`);
+        if (compressedImage.size > 10000000) throw new Error(`image too large: ${(compressedImage.size / 1024 / 1024).toFixed(2)} MB (Max: ${options.maxSizeMB} MB)`);
         return compressedImage;
     } 
     catch (error) {
-        console.log(error);
+        throw error;
     }
 }
 
