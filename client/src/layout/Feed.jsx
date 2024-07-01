@@ -1,27 +1,37 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "src/state/authSlice";
 
-import PostWidget from "src/widgets/PostWidget";
+import PostWidget from "src/layout/PostWidget";
+import { setPosts } from "src/state/authSlice";
 import api from 'src/utils/apiRequests';
+
 import { Box, Typography } from "@mui/material";
 
 
-const FeedWidget = ({ user, isProfile }) => {
+const Feed = ({ user, isProfile }) => {
     const dispatch = useDispatch();
 
     const posts = useSelector((state) => state.posts);
     const token = useSelector((state) => state.token);
     const [isLoading, setIsLoading] = useState(true);
-    
+    const [errorMessage, setErrorMessage] = useState("");
     
     useEffect(() => {
         const getFeed = async () => {
             setIsLoading(true);
-            const endpoint = isProfile ? `posts/${user._id}` : "posts";
-            const allPosts = (await api(token).get(endpoint)).data;
-            dispatch(setPosts({ posts: allPosts }));
-            setIsLoading(false);
+            setErrorMessage("");
+
+            try {
+                const endpoint = isProfile ? `posts/${user._id}` : "posts";
+                const allPosts = (await api(token).get(endpoint)).data;
+                dispatch(setPosts({ posts: allPosts }));
+                setIsLoading(false);
+                setErrorMessage(allPosts ? "" : "No posts");
+            }
+            catch (error) {
+                setIsLoading(false);
+                setErrorMessage(error?.response?.data?.message || "An unexpected error occurred")
+            }
         };
         getFeed();
     }, [user._id]);
@@ -30,14 +40,14 @@ const FeedWidget = ({ user, isProfile }) => {
     return (
         <>
             {
-            isLoading | !posts | posts?.length == 0 ? (
+            isLoading || errorMessage ? (
                 <Typography
                     mt="5rem"
                     textAlign="center"
                     variant="h2"
                     fontWeight="500"
                 >
-                    {isLoading ? "Loading..." : "No posts"}
+                    {isLoading ? "Loading..." : errorMessage}
                 </Typography>
             ) :
             posts.map((post) => (
@@ -64,4 +74,4 @@ const FeedWidget = ({ user, isProfile }) => {
     );
 };
 
-export default FeedWidget;
+export default Feed;

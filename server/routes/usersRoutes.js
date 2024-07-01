@@ -8,8 +8,7 @@ router.get('/search', verifyToken, searchUsers);
 router.get('/:userId', verifyToken, getUser);
 router.get('/:userId/friends', verifyToken, getUserFriends);
 router.patch('/:userId/:friendId', verifyToken, addRemoveFriend);
-
-router.put('edit/:userId', verifyToken, editProfile);
+router.put('/edit/:userId', verifyToken, editProfile);
 router.delete('/delete/:userId', verifyToken, deleteProfile);
 
 

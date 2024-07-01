@@ -20,13 +20,12 @@ const configPopulate = [
     },
 ];
 
-
 export const addComment = async (req, res) => {
     try {
         const { postId } = req.params;
 
         const post = await PostModel.findById(postId);
-        if (!post) return res.status(404).json({ err: "post not found" });
+        if (!post) return res.status(404).json({ message: "post not found" });
 
         const comment = new CommentModel(req.body);
         comment.post = post._id;
@@ -41,13 +40,12 @@ export const addComment = async (req, res) => {
             .findById(postId)
             .populate(configPopulate);
 
-        res.status(200).json(updatedPost);
+        res.status(201).json(updatedPost);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
-
 
 export const likeComment = async (req, res) => {
     try {
@@ -55,8 +53,7 @@ export const likeComment = async (req, res) => {
         const userId = req.tokenData._id;
 
         const comment = await CommentModel.findById(commentId);
-        if (!comment) return res.status(404).json({ err: "comment not found" });
-
+        if (!comment) return res.status(404).json({ message: "comment not found" });
 
         const isLiked = comment.likes.get(userId);
         isLiked ? comment.likes.delete(userId) : comment.likes.set(userId, true);
@@ -69,21 +66,20 @@ export const likeComment = async (req, res) => {
 
         res.status(200).json(updatedPost);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
-
 
 export const deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
 
         const comment = await CommentModel.findById(commentId);
-        if (!comment) return res.status(404).json({ err: "comment not found" });
+        if (!comment) return res.status(404).json({ message: "comment not found" });
 
         const post = await PostModel.findById(comment.post);
-        if (!post) return res.status(404).json({ err: "post not found" });
+        if (!post) return res.status(404).json({ message: "post not found" });
 
         post.comments.pull(commentId);
         await CommentModel.findByIdAndDelete(commentId);
@@ -95,7 +91,7 @@ export const deleteComment = async (req, res) => {
         
         res.status(200).json(updatedPost);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };

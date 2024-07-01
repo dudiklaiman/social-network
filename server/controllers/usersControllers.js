@@ -1,6 +1,8 @@
 import UserModel from '../models/userModel.js';
+import { createToken } from '../utils/createToken.js';
 import { encryptPassword } from '../utils/passwordEncryption.js';
-import { deleteImage } from '../utils/uploadImage.js';
+import { deleteImage, uploadImage } from '../utils/uploadImage.js';
+import { validateUpdate } from '../validations/userValidations.js';
 
 
 const configPopulateFriends = {
@@ -12,6 +14,7 @@ const configPopulateFriends = {
 export const getUser = async (req, res) => {
     try {
         const { userId } = req.params;
+
         const user = await UserModel
         .findById(userId)
         .select("-password")
@@ -19,49 +22,52 @@ export const getUser = async (req, res) => {
 
         res.status(200).json(user);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 }
 
 export const searchUsers = async (req, res) => {
     try {
         const { query } = req.query;
-        const users = await UserModel
+
+        const searchResults = await UserModel
             .find({ name: { $regex: query, $options: 'i' } })
             .select('name picture');
 
         // Sort the results based on name similarity to the query
-        users.sort((a, b) => {
+        searchResults.sort((a, b) => {
             const scoreA = a.name.toLowerCase().startsWith(query.toLowerCase()) ? 2 : 1;
             const scoreB = b.name.toLowerCase().startsWith(query.toLowerCase()) ? 2 : 1;
             return scoreB - scoreA; // Sort in descending order
         });
 
-        res.status(200).json(users);
+        res.status(200).json(searchResults);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 
 export const getUserFriends = async (req, res) => {
     try {
         const { userId } = req.params;
+
         const { friends } = await UserModel
             .findById(userId)
             .populate(configPopulateFriends);
 
         res.json(friends);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 
 export const addRemoveFriend = async (req, res) => {
     try {
         const { userId, friendId } = req.params;
+
         const user = await UserModel.findById(userId);
         const friend = await UserModel.findById(friendId);
 
@@ -83,27 +89,65 @@ export const addRemoveFriend = async (req, res) => {
 
         res.status(200).json(friends);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 
 export const editProfile = async (req, res) => {
+    const validBody = validateUpdate(req.body)
+    if (validBody.error) return res.status(400).json(validBody.error.details);
+    
     try {
         const { userId } = req.params;
-        if (req.tokenData._id != userId) return res.status(403).json({ error: "cannot modify another user's info" });
 
-        if (req.body.password) req.body.password = await encryptPassword(req.body.password);
+        if (req.tokenData._id != userId) return res.status(403).json({ message: "You cannot modify another user's information" });
 
-        const updatedUser = await UserModel
-        .findByIdAndUpdate(userId, req.body, { new: true })
+        const existingUser = await UserModel.findOne({ email: req.body.email });
+        if (existingUser && existingUser._id != userId) {
+            return res.status(409).json({ message: "Email already in use" });
+        }
 
-        deleteImage();
+        if (req.body?.password) req.body.password = await encryptPassword(req.body.password);
 
-        res.status(200).json(updatedUser);
+        let updatedUser = await UserModel.findByIdAndUpdate(userId, req.body, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        if (req.files) {
+            if (updatedUser.picture) await deleteImage(updatedUser.picture.identifier);
+
+            const uploadedImage = await uploadImage(req.files.picture, "users");
+            if (!uploadedImage) {
+                return res.status(500).json({ message: 'Image upload failed' });
+            }
+
+            const pictureUpdate = {
+                "picture.url": uploadedImage.secure_url,
+                "picture.identifier": uploadedImage.public_id,
+                "picture.createdAt": uploadedImage.created_at
+            };
+            
+            updatedUser = await UserModel
+            .findByIdAndUpdate(userId, { $set: pictureUpdate }, { new: true })
+
+            if (!updatedUser) {
+                return res.status(500).json({ message: 'Failed to update picture' });
+            }
+        }
+
+        const userToReturn = await UserModel
+        .findById(userId)
+        .select("-password")
+        .populate(configPopulateFriends);
+        
+        const token = createToken(userId);
+        
+        res.status(200).json({ token: token, user: userToReturn });
     }
-    catch (err) {
-        res.status(400).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 

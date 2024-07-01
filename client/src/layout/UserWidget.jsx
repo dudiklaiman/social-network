@@ -1,26 +1,23 @@
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { Box, Typography, Divider, useTheme } from "@mui/material";
-import { ManageAccountsOutlined, LocationOnOutlined, WorkOutlineOutlined, CalendarTodayOutlined } from "@mui/icons-material";
-
 import WidgetWrapper from "src/components/utilComponents/WidgetWrapper";
 import FlexBetween from "src/components/utilComponents/FlexBetween";
 import UserImage from "src/components/utilComponents/UserImage";
 import { formatDateToMonthAndYear } from "src/utils/utils";
+
+import { Box, Typography, Divider, useTheme } from "@mui/material";
+import { ManageAccountsOutlined, LocationOnOutlined, WorkOutlineOutlined, CalendarTodayOutlined } from "@mui/icons-material";
 
 
 const UserWidget = ({ user }) => {
     const navigate = useNavigate();
     const { palette } = useTheme();
 
+    const { primary, neutral, background } = palette;
     const loggedInUserId = useSelector((state) => state.user._id);
     const formattedDate = formatDateToMonthAndYear(new Date(user?.createdAt));
     const isOnUserPage = location.href.endsWith(user._id);
-
-    const dark = palette.neutral.dark;
-    const medium = palette.neutral.medium;
-    const main = palette.neutral.main;
 
     const navigateToUserPage = () => {
         if (!isOnUserPage) navigate(`/profile/${user._id}`)
@@ -35,21 +32,17 @@ const UserWidget = ({ user }) => {
                 pb="1.1rem"
             >
                 <FlexBetween gap="1rem">
-                    <UserImage
-                        image={user.picture?.url}
-                        onClick={navigateToUserPage}
-                        isClick={!isOnUserPage}
-                    />
+                    <UserImage image={user.picture?.url} userId={loggedInUserId} />
                     <Box>
                         <Typography
                             onClick={navigateToUserPage}
                             variant="h4"
-                            color={dark}
+                            color={neutral.dark}
                             fontWeight="500"
                             sx={{
                                 ...(!isOnUserPage && {
                                     "&:hover": {
-                                        color: palette.primary.dark,
+                                        color: primary.dark,
                                         cursor: "pointer",
                                     },
                                 })
@@ -57,16 +50,16 @@ const UserWidget = ({ user }) => {
                         >
                             {user.name}
                         </Typography>
-                        <Typography color={medium}>{user.friends.length} friends</Typography>
+                        <Typography color={neutral.medium}>{user.friends.length} friends</Typography>
                     </Box>
                 </FlexBetween>
 
                 {/* Edit profile button (not functional yet) */}
                 {user._id == loggedInUserId && (
                     <Typography
-                        onClick={() => { console.log("page in development"); }}
-                        color={medium}
-                        sx={{ "&:hover": { cursor: "pointer", color: main } }}
+                        onClick={() => navigate("/editprofile")}
+                        color={neutral.medium}
+                        sx={{ "&:hover": { cursor: "pointer", color: neutral.main } }}
                     >
                         <ManageAccountsOutlined />
                     </Typography>
@@ -78,16 +71,16 @@ const UserWidget = ({ user }) => {
             {/* SECOND ROW */}
             <Box p="1rem 0">
                 <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-                    <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-                    <Typography color={medium}>{user.location}</Typography>
+                    <LocationOnOutlined fontSize="large" sx={{ color: neutral.main }} />
+                    <Typography color={neutral.medium}>{user.location}</Typography>
                 </Box>
                 <Box display="flex" alignItems="center" gap="1rem">
-                    <WorkOutlineOutlined fontSize="large" sx={{ color: main }} />
-                    <Typography color={medium}>{user.occupation}</Typography>
+                    <WorkOutlineOutlined fontSize="large" sx={{ color: neutral.main }} />
+                    <Typography color={neutral.medium}>{user.occupation}</Typography>
                 </Box>
                 <Box display="flex" alignItems="center" gap="1rem" mt="0.5rem">
-                    <CalendarTodayOutlined fontSize="large" sx={{ color: main }} />
-                    <Typography color={medium}>Joined: {formattedDate}</Typography>
+                    <CalendarTodayOutlined fontSize="large" sx={{ color: neutral.main }} />
+                    <Typography color={neutral.medium}>Joined: {formattedDate}</Typography>
                 </Box>
             </Box>
 

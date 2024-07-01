@@ -1,6 +1,6 @@
 import UserModel from '../models/userModel.js';
 import { encryptPassword, comparePassword } from '../utils/passwordEncryption.js';
-import { validateLogin, validateRegister } from '../utils/userValidations.js';
+import { validateLogin, validateRegister } from '../validations/userValidations.js';
 import { createToken } from '../utils/createToken.js';
 import { uploadImage } from '../utils/uploadImage.js';
 
@@ -10,7 +10,6 @@ const configPopulateFriends = {
     model: UserModel,
     select: '-password'
 }
-
 
 export const register = async (req, res) => {
     const validBody = validateRegister(req.body)
@@ -31,14 +30,13 @@ export const register = async (req, res) => {
 
         await user.save();
 
-        res.status(201).json(user); // don't actually need to return user
+        res.status(201).json({ message: "successfully created user"});
     }
-    catch (err) {
-        if (err.code == 11000) return res.status(400).json({ error: "Email already in system", code:11000 });
-        res.status(500).json({err})
+    catch (error) {
+        if (error.code == 11000) return res.status(400).json({ message: "Email already exists" });
+        res.status(500).json({ error })
     }
 }
-
 
 export const login = async (req, res) => {
     const validBody = validateLogin(req.body)
@@ -46,10 +44,10 @@ export const login = async (req, res) => {
 
     try {
         const user = await UserModel.findOne({ email: req.body.email.toLowerCase() });
-        if (!user) return res.status(401).json({ msg: "User does not exist" });
+        if (!user) return res.status(401).json({ message: "Wrong email or password" });
 
         const isMatching = await comparePassword(req.body.password, user.password);
-        if (!isMatching) return res.status(401).json({ msg: "Invalid credentials." });
+        if (!isMatching) return res.status(401).json({ message: "Wrong email or password" });
 
         const userToReturn = await UserModel
             .findById(user._id)
@@ -60,7 +58,7 @@ export const login = async (req, res) => {
 
         res.status(200).json({ token, user: userToReturn });
     }
-    catch (err) {
-        res.status(500).json({err})
+    catch (error) {
+        res.status(500).json({ error })
     }
 }

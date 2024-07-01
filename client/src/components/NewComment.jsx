@@ -1,34 +1,48 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "src/state/authSlice";
-
-import { InputBase, useTheme, Button, Box } from "@mui/material";
 
 import FlexBetween from "src/components/utilComponents/FlexBetween";
 import UserImage from "src/components/utilComponents/UserImage";
 import api from "src/utils/apiRequests";
+import { setPost } from "src/state/authSlice";
+import { useError } from "src/context/ErrorContext";
+
+import { Typography, InputBase, useTheme, Button, Box } from "@mui/material";
 
 
 const NewComment = ({ postId }) => {
     const dispatch = useDispatch();
     const { palette } = useTheme();
+    const { showErrorDialog } = useError();
 
-    const [commentBody, setCommentBody] = useState("");
+    const { primary, neutral, background } = palette;
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
+    const [commentBody, setCommentBody] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
 
     const handleNewComment = async () => {
-        const updatedPost = (await api(token).post(`posts/comments/${postId}`, { body: commentBody })).data;
+        setIsLoading(true);
 
-        dispatch(setPost({ post: updatedPost }));
-        setCommentBody("");
+        try {
+            const updatedPost = (await api(token).post(`posts/comments/${postId}`, { body: commentBody })).data;
+    
+            setCommentBody("");
+            dispatch(setPost({ post: updatedPost }));
+        }
+        catch (error) {
+            console.error(error);
+            showErrorDialog(error?.response?.data?.message || "An unexpected error occurred");
+        }
+        
+        setIsLoading(false);
     };
 
     return (
         <Box p="1rem 0rem 1rem 0.5rem">
             <FlexBetween gap="1.5rem">
-                <UserImage image={user.picture.url} size="40px" />
+                <UserImage image={user.picture.url} userId={user._id} size="40px" />
                 <InputBase
                     placeholder="Leave a comment..."
                     onChange={(e) => setCommentBody(e.target.value)}
@@ -37,20 +51,20 @@ const NewComment = ({ postId }) => {
                         fontSize: "12px",
                         width: "100%",
                         height: "40px",
-                        backgroundColor: palette.neutral.light,
+                        backgroundColor: neutral.light,
                         borderRadius: "2rem",
                         padding: "1rem 2rem",
                     }}
                 />
                 <Button
-                    disabled={!commentBody}
+                    disabled={!commentBody || isLoading}
                     onClick={handleNewComment}
                     sx={{
-                        color: palette.background.alt,
-                        backgroundColor: palette.primary.main,
+                        color: background.alt,
+                        backgroundColor: primary.main,
                         borderRadius: "3rem",
                         "&:hover": {
-                            backgroundColor: palette.primary.dark,
+                            backgroundColor: primary.dark,
                         }
                     }}
                 >

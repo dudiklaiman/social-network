@@ -1,7 +1,7 @@
 import CommentModel from '../models/commentModel.js';
 import PostModel from '../models/postModel.js'
 import UserModel from '../models/userModel.js';
-import { validateCreatePost } from '../utils/postValidation.js'
+import { validateCreatePost } from '../validations/postValidation.js'
 import { uploadImage, deleteImage } from '../utils/uploadImage.js';
 
 
@@ -46,8 +46,8 @@ export const createPost = async (req, res) => {
 
         res.status(201).json(allPosts);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 }
 
@@ -60,8 +60,8 @@ export const getPostsFeed = async (req, res) => {
 
         res.status(200).json(allPosts);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 }
 
@@ -76,8 +76,8 @@ export const getUserPosts = async (req, res) => {
 
         res.status(200).json(posts);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 
@@ -87,7 +87,7 @@ export const likePost = async (req, res) => {
         const userId = req.tokenData._id;
 
         const post = await PostModel.findById(postId);
-        if (!post) return res.status(404).json({ err: "post not found" });
+        if (!post) return res.status(404).json({ message: "post not found" });
 
         const isLiked = post.likes.get(userId);
         isLiked ? post.likes.delete(userId) : post.likes.set(userId, true);
@@ -100,8 +100,8 @@ export const likePost = async (req, res) => {
 
         res.status(200).json(updatedPost);
     }
-    catch (err) {
-        res.status(404).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
 
@@ -110,8 +110,9 @@ export const deletePost = async (req, res) => {
         const { postId } = req.params;
         
         const post = await PostModel.findById(postId);
-        if (!post) return res.status(404).json({ err: "post not found" });
-        if (!req.tokenData._id.equals(post.user)) return res.status(403).json({ error: "cannot delete another user's post" });
+        if (!post) return res.status(404).json({ message: "post not found" });
+
+        if (!req.tokenData._id.equals(post.user)) return res.status(403).json({ message: "You cannot delete another user's post" });
 
         await CommentModel.deleteMany({ post: postId });
         if (post.picture.identifier) {
@@ -119,9 +120,9 @@ export const deletePost = async (req, res) => {
         }
         await PostModel.findByIdAndDelete(postId);
 
-        res.status(200).json({ msg: "Post deleted successfully"});
+        res.status(200).json({ message: "Post deleted successfully"});
     }
-    catch (err) {
-        res.status(500).json({ message: err.message });
+    catch (error) {
+        res.status(500).json({ error });
     }
 };
