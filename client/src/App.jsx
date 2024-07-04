@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
+import NotFoundPage404 from './pages/NotFoundPage404';
 import { setLogout, setMode } from './state/authSlice';
 import { ErrorProvider } from './context/ErrorContext';
 
@@ -45,6 +46,7 @@ function App() {
 							<Route path='/' element={isAuth ? <HomePage /> : <Navigate to='/login' />} />
 							<Route path='/profile/:userId' element={isAuth ? <ProfilePage /> : <Navigate to='/login' />} />
 							<Route path='/editprofile' element={isAuth ? <ProfileEditPage /> : <Navigate to='/login' />} />
+							<Route path='/*' element={isAuth ? <NotFoundPage404 /> : <Navigate to='/login' />} />
 						</Routes>
 					</ErrorProvider>
 				</ThemeProvider>

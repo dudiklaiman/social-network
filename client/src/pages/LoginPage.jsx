@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 
 import UserForm from "src/components/UserForm";
 import { setLogin } from "src/state/authSlice";
-import { registerSchema, loginSchema } from "src/utils/validationShemas";
+import { registerSchema, loginSchema } from "src/validations/userValidations";
 import { compressImage } from "src/utils/utils";
 import api from "src/utils/apiRequests";
 
@@ -78,6 +78,7 @@ const LoginPage = () => {
     }
 
     const handleLogin = async (values, onSubmitProps) => {
+        // Filters the 'values' object to hold only the login fields
         const filteredValues = Object.fromEntries(
             loginFields.map(field => [field.name, values[field.name]])
         );

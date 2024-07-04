@@ -6,7 +6,7 @@ import UserForm from "src/components/UserForm";
 import api from "src/utils/apiRequests";
 import { setLogin, setLogout } from "src/state/authSlice";
 import { compressImage } from "src/utils/utils";
-import { editSchema } from "src/utils/validationShemas";
+import { editSchema } from "src/validations/userValidations";
 
 import { Box, Typography, useTheme, useMediaQuery, Button } from "@mui/material";
 
@@ -129,7 +129,7 @@ const ProfileEditPage = () => {
 				backgroundColor={background.alt}
 			>
 				<Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-					Edit your account
+					Edit your profile
 				</Typography>
 
 				<UserForm
