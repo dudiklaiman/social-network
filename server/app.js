@@ -4,12 +4,12 @@ import http from 'http';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import { fileURLToPath } from 'url';
-import  initRoutes  from './routes/configRoutes.js'
+import initRoutes from './routes/configRoutes.js'
 import './db/mongoConnect.js';
 
 
 const corsConfig = {
-    origin: ["https://dudisocial.netlify.app"],
+    origin: ["https://dudisocial.netlify.app", "http://localhost:5173"], // check this
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }

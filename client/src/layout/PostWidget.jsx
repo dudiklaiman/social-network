@@ -37,23 +37,66 @@ const PostWidget = ({
 	const loggedInUserId = useSelector((state) => state.user._id);
 	const mode = useSelector((state) => state.mode);
 	const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
+	const DEFAULT_DESCRIPTION_CHARACTER_LENGTH = 300;
+	const [isDescriptionExpended, setIsDescriptionExpended] = useState(false)
 	const [sortedComments, setSortedComments] = useState(comments);
 	const [anchorEl, setAnchorEl] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const [isDeletePostDialogOpen, setIsDeletePostDialogOpen] = useState(false);
 	const isPostLiked = Boolean(likes[loggedInUserId]);
 	const postLikeCount = Object.keys(likes).length;
 	const postCreationDate = formatTimePassed(createdAt);
 
 	const handlePostLike = async () => {
-		const updatedPost = (await api(token).patch(`posts/like/${postId}`)).data;
-		dispatch(setPost({ post: updatedPost }));
+		setIsLoading(true);
+
+		try {
+			const updatedPost = (await api(token).patch(`posts/like/${postId}`)).data;
+			dispatch(setPost({ post: updatedPost }));
+		}
+		catch (error) {
+			console.error(error);
+			showErrorDialog(error?.response?.data?.message || "An unexpected error occurred");
+		}
+
+		setIsLoading(false);
 	};
 
 	const handleDeletePost = async () => {
-		await api(token).delete(`posts/delete/${postId}`);
-		dispatch(deletePost({ postId: postId }));
+		setIsLoading(true);
+
+		try {
+			await api(token).delete(`posts/delete/${postId}`);
+			dispatch(deletePost({ postId: postId }));
+		}
+		catch (error) {
+			console.error(error);
+			showErrorDialog(error?.response?.data?.message || "An unexpected error occurred");
+		}
+
 		setAnchorEl(null);
+		setIsLoading(false);
+		setIsDeletePostDialogOpen(false);
 	};
+
+	const truncateString = (str, desiredLength) => {
+		if (str.length <= desiredLength) {
+			return str;
+		}
+
+		// Find the last space within the desiredLength
+		const truncated = str.slice(0, desiredLength - 3);
+		const lastSpaceIndex = truncated.lastIndexOf(' ');
+
+		// If there is no space, just cut off at maxLength
+		// if (lastSpaceIndex === -1) {
+		// 	return truncated + "...";
+		// }
+
+		// Slice the string up to the last space
+		return truncated.slice(0, lastSpaceIndex) + "...";
+
+	}
 
 	useEffect(() => {
 		const sortComments = () => {
@@ -91,8 +134,18 @@ const PostWidget = ({
 				color={neutral.main}
 				sx={{ mt: "1rem" }}
 			>
-				{description}
+				{isDescriptionExpended ? description : truncateString(description, DEFAULT_DESCRIPTION_CHARACTER_LENGTH)}
 			</Typography>
+
+			{description.length > DEFAULT_DESCRIPTION_CHARACTER_LENGTH &&
+				<Button
+					sx={{ paddingX: 0, color: neutral.main }}
+					onClick={() => setIsDescriptionExpended(!isDescriptionExpended)}
+				// aria-expanded={isDescriptionExpended}
+				>
+					{isDescriptionExpended ? "View Less" : "View More"}
+				</Button>
+			}
 
 			{picture && (
 				<img
@@ -109,7 +162,10 @@ const PostWidget = ({
 
 					{/* Like button */}
 					<FlexBetween gap="0.3rem">
-						<IconButton onClick={handlePostLike} >
+						<IconButton
+							onClick={handlePostLike}
+							disabled={isLoading}
+						>
 							{isPostLiked ? (
 								<FavoriteOutlined sx={{ color: primary.main }} />
 							) : (
@@ -184,10 +240,18 @@ const PostWidget = ({
 								</DialogTitle>
 
 								<DialogActions>
-									<Button onClick={() => setIsDeletePostDialogOpen(false)} sx={{ color: 'grey' }}>
+									<Button
+										onClick={() => setIsDeletePostDialogOpen(false)}
+										sx={{ color: 'grey' }}
+									>
 										Cancel
 									</Button>
-									<Button onClick={handleDeletePost} color="error" autoFocus>
+									<Button
+										onClick={handleDeletePost}
+										color="error"
+										disabled={isLoading}
+										autoFocus
+									>
 										Yes
 									</Button>
 								</DialogActions>
