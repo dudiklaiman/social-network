@@ -61,8 +61,8 @@ export const likeComment = async (req, res) => {
         await comment.save();
 
         const updatedPost = await PostModel
-        .findById(comment.post)
-        .populate(configPopulate);
+            .findById(comment.post)
+            .populate(configPopulate);
 
         res.status(200).json(updatedPost);
     }
@@ -86,9 +86,9 @@ export const deleteComment = async (req, res) => {
         await post.save();
 
         const updatedPost = await PostModel
-        .findById(comment.post)
-        .populate(configPopulate);
-        
+            .findById(comment.post)
+            .populate(configPopulate);
+
         res.status(200).json(updatedPost);
     }
     catch (error) {
