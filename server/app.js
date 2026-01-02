@@ -9,7 +9,7 @@ import './db/mongoConnect.js';
 
 
 const corsConfig = {
-    origin: ["https://dudisocial.netlify.app", "http://localhost:5173"], // check this
+    origin: ["https://dudisocial.netlify.app", "https://dudiklaiman.com", "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }
